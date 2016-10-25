@@ -10,6 +10,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.zchu.sample.MainActivity">
 
+
     <Button
         android:id="@+id/btn_load"
         android:layout_width="wrap_content"
