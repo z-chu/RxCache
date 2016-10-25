@@ -20,7 +20,6 @@ android {
 
 dependencies {
     compile 'com.android.support:support-v4:24.2.0'
-    compile 'com.google.code.gson:gson:2.2.4'
     compile 'io.reactivex:rxandroid:1.2.1'
     compile 'io.reactivex:rxjava:1.1.8'
     compile 'com.jakewharton:disklrucache:2.0.2'
