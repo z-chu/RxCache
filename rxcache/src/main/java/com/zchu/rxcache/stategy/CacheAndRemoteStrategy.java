@@ -1,12 +1,11 @@
 package com.zchu.rxcache.stategy;
 
-import com.zchu.rxcache.RxCache;
 import com.zchu.rxcache.CacheTarget;
+import com.zchu.rxcache.RxCache;
 import com.zchu.rxcache.data.CacheResult;
 
 import rx.Observable;
 import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 
 /**
  * 先缓存，后网络
@@ -26,8 +25,6 @@ import rx.schedulers.Schedulers;
                     public Boolean call(CacheResult<T> result) {
                         return result.data != null;
                     }
-                })
-                .onBackpressureBuffer()
-                .subscribeOn(Schedulers.io());
+                });
     }
 }

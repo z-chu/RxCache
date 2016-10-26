@@ -6,7 +6,6 @@ import com.zchu.rxcache.data.CacheResult;
 
 import rx.Observable;
 import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 
 /**
  *
@@ -33,7 +32,6 @@ import rx.schedulers.Schedulers;
                     public Boolean call(CacheResult<T> tResultData) {
                         return tResultData != null && tResultData.data != null;
                     }
-                })
-                .subscribeOn(Schedulers.io());
+                });
     }
 }

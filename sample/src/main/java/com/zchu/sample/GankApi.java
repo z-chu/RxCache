@@ -11,6 +11,6 @@ import rx.Observable;
 public interface GankApi {
     String BASE_URL = "http://gank.io/api/";
 
-    @GET("history/content/20/{page}")
+    @GET("history/content/3/{page}")
     Observable<GankBean> getHistoryGank(@Path("page") int page);
 }
