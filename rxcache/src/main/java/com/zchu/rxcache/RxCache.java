@@ -20,9 +20,7 @@ import rx.exceptions.Exceptions;
  * 作者: 赵成柱 on 2016/9/9 0012.
  */
 public final class RxCache {
-    private static final int MIN_DISK_CACHE_SIZE = 5 * 1024 * 1024; // 5MB
-    private static final int MAX_DISK_CACHE_SIZE = 50 * 1024 * 1024; // 50MB
-    private static final int DEFAULT_MEMORY_CACHE_SIZE=(int) (Runtime.getRuntime().maxMemory()/8);//运行内存的8分之1
+
 
     private final CacheCore cacheCore;
 
@@ -125,6 +123,9 @@ public final class RxCache {
      * 构造器
      */
     public static final class Builder {
+        private static final int MIN_DISK_CACHE_SIZE = 5 * 1024 * 1024; // 5MB
+        private static final int MAX_DISK_CACHE_SIZE = 50 * 1024 * 1024; // 50MB
+        private static final int DEFAULT_MEMORY_CACHE_SIZE=(int) (Runtime.getRuntime().maxMemory()/8);//运行内存的8分之1
         private int memoryMaxSize;
         private int appVersion;
         private long diskMaxSize;
@@ -133,11 +134,18 @@ public final class RxCache {
 
         public Builder(){
         }
+
+        /**
+         * 不设置,默认为运行内存的8分之1
+         */
         public Builder memoryMax(int maxSize) {
             this.memoryMaxSize = maxSize;
             return this;
         }
 
+        /**
+         * 不设置，默认为1
+         */
         public Builder appVersion(int appVersion) {
             this.appVersion = appVersion;
             return this;
@@ -154,7 +162,9 @@ public final class RxCache {
             return this;
         }
 
-
+        /**
+         * 不设置， 默为认50MB
+         */
         public Builder diskMax(long maxSize) {
             this.diskMaxSize = maxSize;
             return this;
@@ -179,21 +189,23 @@ public final class RxCache {
             return  new RxCache(memoryMaxSize,appVersion,diskMaxSize,diskDir,diskConverter);
         }
 
-    }
+        private static long calculateDiskCacheSize(File dir) {
+            long size = 0;
 
-    private static long calculateDiskCacheSize(File dir) {
-        long size = 0;
-
-        try {
-            StatFs statFs = new StatFs(dir.getAbsolutePath());
-            long available = ((long) statFs.getBlockCount()) * statFs.getBlockSize();
-            // Target 2% of the total space.
-            size = available / 50;
-        } catch (IllegalArgumentException ignored) {
+            try {
+                StatFs statFs = new StatFs(dir.getAbsolutePath());
+                long available = ((long) statFs.getBlockCount()) * statFs.getBlockSize();
+                // Target 2% of the total space.
+                size = available / 50;
+            } catch (IllegalArgumentException ignored) {
+            }
+            // Bound inside min/max size for disk cache.
+            return Math.max(Math.min(size, MAX_DISK_CACHE_SIZE), MIN_DISK_CACHE_SIZE);
         }
-        // Bound inside min/max size for disk cache.
-        return Math.max(Math.min(size, MAX_DISK_CACHE_SIZE), MIN_DISK_CACHE_SIZE);
+
     }
+
+
 
 
 }

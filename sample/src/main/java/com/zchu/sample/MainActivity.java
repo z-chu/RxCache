@@ -43,8 +43,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Subscription mSubscription;
 
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,16 +67,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .build()
                 .create(GankApi.class);
         rxCache = new RxCache.Builder()
-                .appVersion(2)
+                .appVersion(1)//不设置，默认为1
                 .diskDir(new File(getCacheDir().getPath() + File.separator + "data-cache"))
-                .diskConverter(new SerializableDiskConverter())
+                .diskConverter(new SerializableDiskConverter())//目前只支持Serializable缓存
+                .memoryMax(2*1024*1024)//不设置,默认为运行内存的8分之1
+                .diskMax(20*1024*1024)//不设置， 默为认50MB
                 .build();
         Logger.init("RxCache");
     }
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.btn_first_remote:
                 loadData(CacheStrategy.firstRemote());
                 break;
@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void loadData(IStrategy strategy) {
-        if(mSubscription!=null&&!mSubscription.isUnsubscribed()){
+        if (mSubscription != null && !mSubscription.isUnsubscribed()) {
             mSubscription.unsubscribe();
         }
         tvData.setText("加载中...");
@@ -121,10 +121,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                     @Override
                     public void onNext(CacheResult<GankBean> gankBeanCacheResult) {
-                        if(gankBeanCacheResult.from== ResultFrom.Cache){
-                            tvData.setText("来自缓存：\n"+gankBeanCacheResult.toString());
-                        }else{
-                            tvData.setText("来自网络：\n"+gankBeanCacheResult.toString());
+                        if (gankBeanCacheResult.from == ResultFrom.Cache) {
+                            tvData.setText("来自缓存：\n" + gankBeanCacheResult.toString());
+                        } else {
+                            tvData.setText("来自网络：\n" + gankBeanCacheResult.toString());
                         }
 
                     }
