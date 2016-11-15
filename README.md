@@ -27,12 +27,12 @@ rxCache = new RxCache.Builder()
                 .diskDir(new File(getCacheDir().getPath() + File.separator + "data-cache"))
                 .diskConverter(new SerializableDiskConverter())//目前只支持Serializable缓存
                 .memoryMax(2*1024*1024)//不设置,默认为运行内存的8分之1
-                .diskMax(20*1024*1024)//不设置， 默为认50MB
+                .diskMax(20*1024*1024)//不设置， 默认为50MB
                 .build();
 ```
 在原有代码的基础上，仅需一行代码搞定
 ```java
-.compose(rxCache.transformer(MD5.getMessageDigest("custom_key"), CacheStrategy.firstRemote()))
+.compose(rxCache.transformer（custom_key, CacheStrategy.firstRemote()))
 ```
 在这里声明缓存策略即可，不影响原有代码结构
 
