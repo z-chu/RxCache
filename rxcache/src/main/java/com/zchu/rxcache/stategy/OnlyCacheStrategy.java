@@ -14,8 +14,9 @@ import rx.Observable;
 
     public static final  OnlyCacheStrategy INSTANCE=new OnlyCacheStrategy();
 
+
     @Override
-    public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source) {
-        return loadCache(rxCache,key);
+    public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Class<T> classOf) {
+        return loadCache(rxCache,key,classOf);
     }
 }

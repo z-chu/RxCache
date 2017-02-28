@@ -16,7 +16,7 @@ public interface IDiskConverter {
      * @param source
      * @return
      */
-   Object load(InputStream source);
+    <T> T  load(InputStream source, Class<T> classOf);
 
     /**
      * 写入

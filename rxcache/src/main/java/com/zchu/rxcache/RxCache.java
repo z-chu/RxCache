@@ -28,11 +28,11 @@ public final class RxCache {
         cacheCore = new CacheCore(new LruMemoryCache(memoryMaxSize), new LruDiskCache(diskConverter,diskDir,appVersion,diskMaxSize));
     }
 
-    public <T> Observable.Transformer<T, CacheResult<T>> transformer(final String key, final IStrategy strategy) {
+    public <T> Observable.Transformer<T, CacheResult<T>> transformer(final String key, final IStrategy strategy, final Class<T> classOfT) {
         return new Observable.Transformer<T, CacheResult<T>>() {
             @Override
             public Observable<CacheResult<T>> call(Observable<T> tObservable) {
-                return strategy.execute(RxCache.this,key,tObservable);
+                return strategy.execute(RxCache.this,key,tObservable,classOfT);
             }
         };
     }
@@ -65,12 +65,12 @@ public final class RxCache {
     /**
      * 读取
      */
-    public <T> rx.Observable<T> load(final String key) {
+    public <T> rx.Observable<T> load(final String key, final Class<T> classOf) {
         return rx.Observable.create(new SimpleSubscribe<T>() {
             @Override
             T execute() {
                 LogUtils.debug("loadCache  key=" + key);
-                return cacheCore.load(key);
+                return cacheCore.load(key,classOf);
             }
         });
     }

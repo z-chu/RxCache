@@ -1,7 +1,5 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
 
-group='com.github.z-chu'
 android {
     compileSdkVersion 24
     buildToolsVersion "24.0.2"
@@ -25,5 +23,5 @@ dependencies {
     compile 'io.reactivex:rxandroid:1.2.1'
     compile 'io.reactivex:rxjava:1.1.8'
     compile 'com.jakewharton:disklrucache:2.0.2'
-
+    compile 'com.google.code.gson:gson:2.8.0'
 }

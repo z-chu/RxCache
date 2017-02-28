@@ -19,16 +19,16 @@ class CacheCore {
     /**
      * 读取
      */
-    <T> T load(String key) {
+    <T> T load(String key, Class<T> classOf) {
         if (memory != null) {
-            T result = memory.load(key, 0);
+            T result = memory.load(key, 0,classOf);
             if (result != null) {
                 return result;
             }
         }
 
         if (disk != null) {
-            T result = disk.load(key, 0);
+            T result = disk.load(key, 0,classOf);
             if (result != null) {
                 return result;
             }

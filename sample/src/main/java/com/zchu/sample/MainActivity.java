@@ -10,7 +10,7 @@ import com.zchu.log.Logger;
 import com.zchu.rxcache.RxCache;
 import com.zchu.rxcache.data.CacheResult;
 import com.zchu.rxcache.data.ResultFrom;
-import com.zchu.rxcache.diskconverter.SerializableDiskConverter;
+import com.zchu.rxcache.diskconverter.GsonDiskConverter;
 import com.zchu.rxcache.stategy.CacheStrategy;
 import com.zchu.rxcache.stategy.IStrategy;
 import com.zchu.sample.utils.MD5;
@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         rxCache = new RxCache.Builder()
                 .appVersion(1)//不设置，默认为1
                 .diskDir(new File(getCacheDir().getPath() + File.separator + "data-cache"))
-                .diskConverter(new SerializableDiskConverter())//目前只支持Serializable缓存
+                .diskConverter(new GsonDiskConverter())//目前只支持Serializable缓存
                 .memoryMax(2*1024*1024)//不设置,默认为运行内存的8分之1
                 .diskMax(20*1024*1024)//不设置， 默为认50MB
                 .build();
@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         tvData.setText("加载中...");
         mSubscription = gankApi.getHistoryGank(1)
-                .compose(rxCache.<GankBean>transformer(MD5.getMessageDigest("custom_key"), strategy))
+                .compose(rxCache.<GankBean>transformer(MD5.getMessageDigest("custom_key"), strategy,GankBean.class))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<CacheResult<GankBean>>() {

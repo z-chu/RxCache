@@ -43,4 +43,6 @@ dependencies {
     compile 'com.github.z-chu:ZLog:1.1'
 
     compile project(':rxcache')
+    //compile 'com.github.z-chu:RxCache:1.0'
+
 }

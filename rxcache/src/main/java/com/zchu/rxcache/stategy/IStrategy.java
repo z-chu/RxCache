@@ -11,6 +11,6 @@ import rx.Observable;
  */
 public interface IStrategy {
 
-    <T> rx.Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source);
+    <T> rx.Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Class<T> classOf);
 
 }

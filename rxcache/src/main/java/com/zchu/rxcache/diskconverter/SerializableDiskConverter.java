@@ -14,12 +14,12 @@ import java.io.OutputStream;
 public class SerializableDiskConverter implements IDiskConverter {
 
     @Override
-    public Object load(InputStream source) {
-        Object value = null;
+    public <T> T load(InputStream source, Class<T> classOf) {
+        T value = null;
         ObjectInputStream oin = null;
         try {
             oin = new ObjectInputStream(source);
-            value = oin.readObject();
+            value = (T) oin.readObject();
         } catch (IOException | ClassNotFoundException e) {
             LogUtils.log(e);
         } finally {

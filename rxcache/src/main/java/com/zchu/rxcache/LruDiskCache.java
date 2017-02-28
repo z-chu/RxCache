@@ -26,8 +26,8 @@ class LruDiskCache {
         }
     }
 
-     <T> T load(String key, long existTime) {
-        if (mDiskLruCache == null) {
+     <T> T load(String key, long existTime, Class<T> classOf) {
+         if (mDiskLruCache == null) {
             return null;
         }
         try {
@@ -38,7 +38,7 @@ class LruDiskCache {
             InputStream source = edit.newInputStream(0);
             T value ;
             if (source != null) {
-                value = (T) mDiskConverter.load(source);
+                value = mDiskConverter.load(source, classOf);
                 Utils.close(source);
                 edit.commit();
                 return value;

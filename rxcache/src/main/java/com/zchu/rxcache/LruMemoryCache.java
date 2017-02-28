@@ -26,7 +26,7 @@ class LruMemoryCache {
         };
     }
 
-    public <T> T load(String key, long existTime) {
+    public <T> T load(String key, long existTime, Class<T> classOf) {
          return (T) mCache.get(key);
     }
 
