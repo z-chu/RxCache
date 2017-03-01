@@ -24,15 +24,24 @@ public final class RxCache {
 
     private final CacheCore cacheCore;
 
-    private RxCache(int memoryMaxSize,int appVersion, long diskMaxSize, File diskDir, IDiskConverter diskConverter) {
-        cacheCore = new CacheCore(new LruMemoryCache(memoryMaxSize), new LruDiskCache(diskConverter,diskDir,appVersion,diskMaxSize));
+    private RxCache(Builder builder) {
+        LruMemoryCache memoryCache = null;
+        if (builder.memoryMaxSize > 0) {
+            memoryCache = new LruMemoryCache(builder.memoryMaxSize);
+        }
+        LruDiskCache lruDiskCache = null;
+        if (builder.diskMaxSize > 0) {
+            lruDiskCache=new LruDiskCache(builder.diskConverter, builder.diskDir, builder.appVersion, builder.diskMaxSize);
+        }
+        cacheCore = new CacheCore(memoryCache, lruDiskCache);
+
     }
 
     public <T> Observable.Transformer<T, CacheResult<T>> transformer(final String key, final IStrategy strategy, final Class<T> classOfT) {
         return new Observable.Transformer<T, CacheResult<T>>() {
             @Override
             public Observable<CacheResult<T>> call(Observable<T> tObservable) {
-                return strategy.execute(RxCache.this,key,tObservable,classOfT);
+                return strategy.execute(RxCache.this, key, tObservable, classOfT);
             }
         };
     }
@@ -70,7 +79,7 @@ public final class RxCache {
             @Override
             T execute() {
                 LogUtils.debug("loadCache  key=" + key);
-                return cacheCore.load(key,classOf);
+                return cacheCore.load(key, classOf);
             }
         });
     }
@@ -82,8 +91,7 @@ public final class RxCache {
         return rx.Observable.create(new SimpleSubscribe<Boolean>() {
             @Override
             Boolean execute() throws Throwable {
-                cacheCore.save(key, value, target);
-                return true;
+                return cacheCore.save(key, value, target);
             }
         });
     }
@@ -100,7 +108,6 @@ public final class RxCache {
 
     /**
      * 删除缓存
-     *
      */
     public boolean remove(final String key) {
         return cacheCore.remove(key);
@@ -125,14 +132,14 @@ public final class RxCache {
     public static final class Builder {
         private static final int MIN_DISK_CACHE_SIZE = 5 * 1024 * 1024; // 5MB
         private static final int MAX_DISK_CACHE_SIZE = 50 * 1024 * 1024; // 50MB
-        private static final int DEFAULT_MEMORY_CACHE_SIZE=(int) (Runtime.getRuntime().maxMemory()/8);//运行内存的8分之1
-        private int memoryMaxSize;
+        private static final int DEFAULT_MEMORY_CACHE_SIZE = (int) (Runtime.getRuntime().maxMemory() / 8);//运行内存的8分之1
+        private Integer memoryMaxSize;
+        private Long diskMaxSize;
         private int appVersion;
-        private long diskMaxSize;
         private File diskDir;
         private IDiskConverter diskConverter;
 
-        public Builder(){
+        public Builder() {
         }
 
         /**
@@ -169,24 +176,25 @@ public final class RxCache {
             this.diskMaxSize = maxSize;
             return this;
         }
+
         public RxCache build() {
-            if(this.diskDir==null){
+            if (this.diskDir == null) {
                 throw new NullPointerException("DiskDir can not be null.");
             }
             if (!this.diskDir.exists()) {
-               this.diskDir.mkdirs();
+                this.diskDir.mkdirs();
             }
-            if(this.diskConverter==null){
-                this.diskConverter=new SerializableDiskConverter();
+            if (this.diskConverter == null) {
+                this.diskConverter = new SerializableDiskConverter();
             }
-            if(memoryMaxSize<=0){
-                memoryMaxSize= DEFAULT_MEMORY_CACHE_SIZE;
+            if (memoryMaxSize == null) {
+                memoryMaxSize = DEFAULT_MEMORY_CACHE_SIZE;
             }
-            if(diskMaxSize<=0){
-                diskMaxSize=calculateDiskCacheSize(diskDir);
+            if (diskMaxSize == null) {
+                diskMaxSize = calculateDiskCacheSize(diskDir);
             }
-            appVersion=Math.max(1,this.appVersion);
-            return  new RxCache(memoryMaxSize,appVersion,diskMaxSize,diskDir,diskConverter);
+            appVersion = Math.max(1, this.appVersion);
+            return new RxCache(this);
         }
 
         private static long calculateDiskCacheSize(File dir) {
@@ -204,8 +212,6 @@ public final class RxCache {
         }
 
     }
-
-
 
 
 }

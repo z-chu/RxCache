@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .appVersion(1)//不设置，默认为1
                 .diskDir(new File(getCacheDir().getPath() + File.separator + "data-cache"))
                 .diskConverter(new GsonDiskConverter())//目前只支持Serializable缓存
-                .memoryMax(2*1024*1024)//不设置,默认为运行内存的8分之1
+                .memoryMax(0)//不设置,默认为运行内存的8分之1
                 .diskMax(20*1024*1024)//不设置， 默为认50MB
                 .build();
         Logger.init("RxCache");
@@ -111,7 +111,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .subscribe(new Subscriber<CacheResult<GankBean>>() {
                     @Override
                     public void onCompleted() {
-
                     }
 
                     @Override
