@@ -3,14 +3,14 @@
 
 <img src="/screenshots/s0.gif" alt="screenshot" title="screenshot" width="270" height="486" />
 
-##特性
-###缓存层级
+## 特性
+### 缓存层级
 
 * 网络
 * 磁盘缓存 - DiskLruCache
 * 内存缓存 - LruCache
 
-###缓存策略 
+### 缓存策略 
 
 * 仅缓存
 * 仅网络
@@ -18,7 +18,7 @@
 * 优先网络
 * 先缓存后网络
 
-##如何使用
+## 如何使用
 
 准备RxCache
 ```java
@@ -36,7 +36,7 @@ rxCache = new RxCache.Builder()
 ```
 在这里声明缓存策略即可，不影响原有代码结构
 
-###引入
+### 引入
 此lib加入了JitPack 引用方法 根目录下的build.gradle
 
 ```groovy
