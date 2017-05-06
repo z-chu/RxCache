@@ -76,7 +76,7 @@ gankApi.getHistoryGank(1)
 
 ### 引入
 ```groovy
-	dependencies {
-	        compile 'com.zchu:rxcache:1.0.0'
-	}
+dependencies {
+	compile 'com.zchu:rxcache:1.0.0'
+}
 ```
