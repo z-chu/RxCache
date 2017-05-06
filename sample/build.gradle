@@ -48,7 +48,7 @@ dependencies {
     compile 'com.zchu:zlog:1.0.0'
 
 
-    //compile project(':rxcache')
-    compile 'com.zchu:rxcache:1.0.0'
+    compile project(':rxcache')
+    //compile 'com.zchu:rxcache:1.2.0'
 
 }
