@@ -9,6 +9,7 @@ import com.zchu.rxcache.stategy.IStrategy;
 import com.zchu.rxcache.utils.LogUtils;
 
 import java.io.File;
+import java.security.MessageDigest;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -31,17 +32,17 @@ public final class RxCache {
         }
         LruDiskCache lruDiskCache = null;
         if (builder.diskMaxSize > 0) {
-            lruDiskCache=new LruDiskCache(builder.diskConverter, builder.diskDir, builder.appVersion, builder.diskMaxSize);
+            lruDiskCache = new LruDiskCache(builder.diskConverter, builder.diskDir, builder.appVersion, builder.diskMaxSize);
         }
         cacheCore = new CacheCore(memoryCache, lruDiskCache);
 
     }
 
-    public <T> Observable.Transformer<T, CacheResult<T>> transformer(final String key, final IStrategy strategy, final Class<T> classOfT) {
+    public <T> Observable.Transformer<T, CacheResult<T>> transformer(final String key, final IStrategy strategy) {
         return new Observable.Transformer<T, CacheResult<T>>() {
             @Override
             public Observable<CacheResult<T>> call(Observable<T> tObservable) {
-                return strategy.execute(RxCache.this, key, tObservable, classOfT);
+                return strategy.execute(RxCache.this, getMD5MessageDigest(key), tObservable);
             }
         };
     }
@@ -74,12 +75,12 @@ public final class RxCache {
     /**
      * 读取
      */
-    public <T> rx.Observable<T> load(final String key, final Class<T> classOf) {
+    public <T> rx.Observable<T> load(final String key) {
         return rx.Observable.create(new SimpleSubscribe<T>() {
             @Override
             T execute() {
                 LogUtils.debug("loadCache  key=" + key);
-                return cacheCore.load(key, classOf);
+                return cacheCore.load(getMD5MessageDigest(key));
             }
         });
     }
@@ -91,7 +92,7 @@ public final class RxCache {
         return rx.Observable.create(new SimpleSubscribe<Boolean>() {
             @Override
             Boolean execute() throws Throwable {
-                return cacheCore.save(key, value, target);
+                return cacheCore.save(getMD5MessageDigest(key), value, target);
             }
         });
     }
@@ -103,14 +104,14 @@ public final class RxCache {
      * @return
      */
     public boolean containsKey(final String key) {
-        return cacheCore.containsKey(key);
+        return cacheCore.containsKey(getMD5MessageDigest(key));
     }
 
     /**
      * 删除缓存
      */
     public boolean remove(final String key) {
-        return cacheCore.remove(key);
+        return cacheCore.remove(getMD5MessageDigest(key));
     }
 
     /**
@@ -143,7 +144,7 @@ public final class RxCache {
         }
 
         /**
-         * 不设置,默认为运行内存的8分之1
+         * 不设置,默认为运行内存的8分之1.设置0,或小于0，则不开启内存缓存;
          */
         public Builder memoryMax(int maxSize) {
             this.memoryMaxSize = maxSize;
@@ -151,7 +152,7 @@ public final class RxCache {
         }
 
         /**
-         * 不设置，默认为1
+         * 不设置，默认为1.需要注意的是,每当版本号改变,缓存路径下存储的所有数据都会被清除掉,所有的数据都应该从网上重新获取.
          */
         public Builder appVersion(int appVersion) {
             this.appVersion = appVersion;
@@ -170,7 +171,7 @@ public final class RxCache {
         }
 
         /**
-         * 不设置， 默为认50MB
+         * 不设置， 默为认50MB.设置0,或小于0，则不开启硬盘缓存;
          */
         public Builder diskMax(long maxSize) {
             this.diskMaxSize = maxSize;
@@ -213,5 +214,24 @@ public final class RxCache {
 
     }
 
+    static String getMD5MessageDigest(String buffer) {
+        char hexDigits[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+        try {
+            MessageDigest mdTemp = MessageDigest.getInstance("MD5");
+            mdTemp.update(buffer.getBytes());
+            byte[] md = mdTemp.digest();
+            int j = md.length;
+            char str[] = new char[j * 2];
+            int k = 0;
+            for (int i = 0; i < j; i++) {
+                byte byte0 = md[i];
+                str[k++] = hexDigits[byte0 >>> 4 & 0xf];
+                str[k++] = hexDigits[byte0 & 0xf];
+            }
+            return new String(str);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
 }

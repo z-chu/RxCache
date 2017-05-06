@@ -17,9 +17,9 @@ import rx.schedulers.Schedulers;
 abstract class BaseStrategy implements IStrategy {
 
 
-    <T> Observable<CacheResult<T>> loadCache(final RxCache rxCache, final String key, Class<T> classOf) {
+    <T> Observable<CacheResult<T>> loadCache(final RxCache rxCache, final String key) {
         return rxCache
-                .load(key,classOf)
+                .<T>load(key)
                 .map(new Func1<T, CacheResult<T>>() {
                     @Override
                     public CacheResult<T> call(T o) {
@@ -48,5 +48,5 @@ abstract class BaseStrategy implements IStrategy {
     }
 
     @Override
-    public abstract <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Class<T> classOf);
+    public abstract <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source);
 }

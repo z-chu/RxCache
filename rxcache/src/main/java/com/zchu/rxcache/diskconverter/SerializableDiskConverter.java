@@ -38,10 +38,10 @@ public class SerializableDiskConverter implements IDiskConverter {
             return true;
         } catch (IOException e) {
             LogUtils.log(e);
-            return false;
         } finally {
             Utils.close(oos);
         }
+        return false;
     }
 
 }

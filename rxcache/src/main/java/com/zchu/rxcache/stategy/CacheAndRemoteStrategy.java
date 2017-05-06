@@ -18,14 +18,14 @@ class CacheAndRemoteStrategy extends BaseStrategy {
     public static CacheAndRemoteStrategy INSTANCE = new CacheAndRemoteStrategy();
 
     @Override
-    public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Class<T> classOf) {
-        Observable<CacheResult<T>> cache = loadCache(rxCache, key, classOf);
+    public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source) {
+        Observable<CacheResult<T>> cache = loadCache(rxCache, key);
         Observable<CacheResult<T>> remote = loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk);
         return Observable.concat(cache, remote)
                 .filter(new Func1<CacheResult<T>, Boolean>() {
                     @Override
                     public Boolean call(CacheResult<T> result) {
-                        return result.data != null;
+                        return result!=null&&result.getData() != null;
                     }
                 });
     }

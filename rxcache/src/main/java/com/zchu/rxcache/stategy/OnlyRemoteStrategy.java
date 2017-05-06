@@ -16,7 +16,7 @@ import rx.Observable;
     public static final  OnlyRemoteStrategy INSTANCE=new OnlyRemoteStrategy();
 
     @Override
-    public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source,Class<T> classOf) {
+    public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source) {
         return loadRemote(rxCache,key, source, CacheTarget.MemoryAndDisk);
     }
 }

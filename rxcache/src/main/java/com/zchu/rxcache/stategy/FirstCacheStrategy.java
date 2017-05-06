@@ -18,8 +18,8 @@ class FirstCacheStrategy extends BaseStrategy {
     public static FirstCacheStrategy INSTANCE = new FirstCacheStrategy();
 
     @Override
-    public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Class<T> classOf) {
-        Observable<CacheResult<T>> cache = loadCache(rxCache, key, classOf);
+    public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source) {
+        Observable<CacheResult<T>> cache = loadCache(rxCache, key);
         cache.onErrorReturn(new Func1<Throwable, CacheResult<T>>() {
             @Override
             public CacheResult<T> call(Throwable throwable) {
@@ -30,8 +30,8 @@ class FirstCacheStrategy extends BaseStrategy {
         return Observable.concat(cache, remote)
                 .firstOrDefault(null, new Func1<CacheResult<T>, Boolean>() {
                     @Override
-                    public Boolean call(CacheResult<T> tResultData) {
-                        return tResultData != null && tResultData.data != null;
+                    public Boolean call(CacheResult<T> result) {
+                        return result != null && result.getData() != null;
                     }
                 });
     }

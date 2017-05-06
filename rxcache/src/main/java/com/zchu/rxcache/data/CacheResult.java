@@ -5,9 +5,9 @@ package com.zchu.rxcache.data;
  */
 public class CacheResult<T> {
 
-    public ResultFrom from;
-    public String key;
-    public T data;
+    private ResultFrom from;
+    private String key;
+    private T data;
 
     public CacheResult() {
     }

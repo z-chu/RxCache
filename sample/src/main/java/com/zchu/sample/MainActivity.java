@@ -67,11 +67,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .build()
                 .create(GankApi.class);
         rxCache = new RxCache.Builder()
-                .appVersion(1)//不设置，默认为1
+                .appVersion(2)//不设置，默认为1。需要注意的是，每当版本号改变，缓存路径下存储的所有数据都会被清除掉，所有的数据都应该从网上重新获取
                 .diskDir(new File(getCacheDir().getPath() + File.separator + "data-cache"))
-                .diskConverter(new GsonDiskConverter())//目前只支持Serializable缓存
-                .memoryMax(0)//不设置,默认为运行内存的8分之1
-                .diskMax(20*1024*1024)//不设置， 默为认50MB
+                .diskConverter(new GsonDiskConverter())
+                .diskMax(20 * 1024 * 1024)//设置0,不开启磁盘缓存;不设置， 默为认50MB
                 .build();
         Logger.init("RxCache");
     }
@@ -105,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         tvData.setText("加载中...");
         mSubscription = gankApi.getHistoryGank(1)
-                .compose(rxCache.<GankBean>transformer(MD5.getMessageDigest("custom_key"), strategy,GankBean.class))
+                .compose(rxCache.<GankBean>transformer(MD5.getMessageDigest("custom_key"), strategy))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<CacheResult<GankBean>>() {
@@ -120,9 +119,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                     @Override
                     public void onNext(CacheResult<GankBean> gankBeanCacheResult) {
-                        if (gankBeanCacheResult.from == ResultFrom.Cache) {
+                        if (gankBeanCacheResult.getFrom() == ResultFrom.Cache) {
+                            Logger.e(gankBeanCacheResult);
                             tvData.setText("来自缓存：\n" + gankBeanCacheResult.toString());
                         } else {
+                            Logger.e(gankBeanCacheResult);
                             tvData.setText("来自网络：\n" + gankBeanCacheResult.toString());
                         }
 

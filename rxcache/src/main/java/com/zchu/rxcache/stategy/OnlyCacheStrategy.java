@@ -16,7 +16,7 @@ import rx.Observable;
 
 
     @Override
-    public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Class<T> classOf) {
-        return loadCache(rxCache,key,classOf);
+    public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source) {
+        return loadCache(rxCache,key);
     }
 }

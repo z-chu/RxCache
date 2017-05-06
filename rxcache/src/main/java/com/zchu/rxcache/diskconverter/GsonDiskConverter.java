@@ -42,6 +42,8 @@ public class GsonDiskConverter implements IDiskConverter {
             return true;
         } catch (JsonIOException | IOException e) {
             LogUtils.log(e);
+        }finally {
+            Utils.close(sink);
         }
         return false;
     }
