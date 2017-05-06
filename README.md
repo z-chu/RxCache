@@ -5,51 +5,78 @@
 
 ## 特性
 ### 缓存层级
-
 * 网络
 * 磁盘缓存 - DiskLruCache
 * 内存缓存 - LruCache
 
-### 缓存策略 
-
+### 缓存策略-尽可能适应多种使用场景
 * 仅缓存
 * 仅网络
 * 优先缓存
 * 优先网络
 * 先缓存后网络
 
+### 缓存置换算法
+* 最久未使用算法（LRU）：最久没有访问的内容作为替换对象
+
+### 存储策略 - 支持不同数据的缓存需求
+* 不存储
+* 仅内存
+* 仅磁盘
+* 内存+磁盘
+
 ## 如何使用
 
-准备RxCache
+准备RxCache,可以用单例模式创建一个全局的RxCache
 ```java
 rxCache = new RxCache.Builder()
-                .appVersion(1)//不设置，默认为1
+                .appVersion(1)
                 .diskDir(new File(getCacheDir().getPath() + File.separator + "data-cache"))
-                .diskConverter(new SerializableDiskConverter())//目前只支持Serializable缓存
-                .memoryMax(2*1024*1024)//不设置,默认为运行内存的8分之1
-                .diskMax(20*1024*1024)//不设置， 默认为50MB
+                .diskConverter(new SerializableDiskConverter())//支持Serializable、Json(GsonDiskConverter)
+                .memoryMax(2*1024*1024)
+                .diskMax(20*1024*1024)
                 .build();
 ```
-在原有代码的基础上，仅需一行代码搞定
+在原有代码的基础上，仅需一行代码搞定，**一步到位！！！**
 ```java
-.compose(rxCache.transformer（custom_key, CacheStrategy.firstRemote()))
+.compose(rxCache.<~>transformer（"custom_key", CacheStrategy.firstRemote()))
 ```
 在这里声明缓存策略即可，不影响原有代码结构
 
-### 引入
-此lib加入了JitPack 引用方法 根目录下的build.gradle
+调用示例：
+```java
+gankApi.getHistoryGank(1)
+                .compose(rxCache.<GankBean>transformer("custom_key", strategy))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<CacheResult<GankBean>>() {
+                    @Override
+                    public void onCompleted() {
+                    }
 
-```groovy
-	allprojects {
-		repositories {
-			...
-			maven { url "https://jitpack.io" }
-		}
-	}
+                    @Override
+                    public void onError(Throwable e) {
+                        tvData.setText(e.getMessage());
+                    }
+
+                    @Override
+                    public void onNext(CacheResult<GankBean> gankBeanCacheResult) {
+                        Logger.e(gankBeanCacheResult);
+                        if (gankBeanCacheResult.getFrom() == ResultFrom.Cache) {
+                            tvData.setText("来自缓存：\n" + gankBeanCacheResult.toString());
+                        } else {
+                            tvData.setText("来自网络：\n" + gankBeanCacheResult.toString());
+                        }
+
+                    }
+                });
+
 ```
-项目中
+
+
+### 引入
 ```groovy
 	dependencies {
-	        compile 'com.github.z-chu:RxCache:1.0'
+	        compile 'com.zchu:rxcache:1.0.0'
 	}
 ```
