@@ -1,8 +1,9 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release'
 
 android {
     compileSdkVersion 24
-    buildToolsVersion "24.0.2"
+    buildToolsVersion "25.0.3"
 
     defaultConfig {
         minSdkVersion 11
@@ -16,12 +17,25 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    lintOptions {
+        abortOnError false
+    }
+
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:24.2.0'
+    compile 'com.android.support:support-v4:25.0.1'
     compile 'io.reactivex:rxandroid:1.2.1'
-    compile 'io.reactivex:rxjava:1.1.8'
-    compile 'com.jakewharton:disklrucache:2.0.2'
-    compile 'com.google.code.gson:gson:2.8.0'
+    compile 'io.reactivex:rxjava:1.3.0'
+    compile 'com.jakewharton:disklrucache:+'
+    compile 'com.google.code.gson:gson:+'
+}
+
+publish{
+    userOrg = 'zchu'
+    groupId = 'com.zchu'
+    artifactId = 'rxcache'
+    publishVersion = '1.0.0'
+    desc = 'This is a cache library for android'
+    website = 'https://github.com/z-chu/RxCache'
 }
