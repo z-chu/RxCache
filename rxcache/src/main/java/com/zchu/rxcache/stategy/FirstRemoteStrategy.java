@@ -4,8 +4,10 @@ import com.zchu.rxcache.CacheTarget;
 import com.zchu.rxcache.RxCache;
 import com.zchu.rxcache.data.CacheResult;
 
-import rx.Observable;
-import rx.functions.Func1;
+import io.reactivex.Observable;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Function;
+import io.reactivex.functions.Predicate;
 
 /**
  * 优先网络
@@ -21,19 +23,18 @@ final class FirstRemoteStrategy extends BaseStrategy {
     public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source) {
         Observable<CacheResult<T>> cache = loadCache(rxCache, key);
         Observable<CacheResult<T>> remote = loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk)
-                .onErrorReturn(new Func1<Throwable, CacheResult<T>>() {
+                .onErrorReturn(new Function<Throwable, CacheResult<T>>() {
                     @Override
-                    public CacheResult<T> call(Throwable throwable) {
+                    public CacheResult<T> apply(@NonNull Throwable throwable) throws Exception {
                         return null;
                     }
                 });
         return Observable.concat(remote, cache)
-                .firstOrDefault(null, new Func1<CacheResult<T>, Boolean>() {
+                .filter(new Predicate<CacheResult<T>>() {
                     @Override
-                    public Boolean call(CacheResult<T> result) {
+                    public boolean test(@NonNull CacheResult<T> result) throws Exception {
                         return result != null && result.getData() != null;
                     }
-                });
-
+                }).firstElement().toObservable();
     }
 }

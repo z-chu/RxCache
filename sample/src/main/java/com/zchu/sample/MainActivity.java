@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import com.zchu.log.Logger;
 import com.zchu.rxcache.RxCache;
 import com.zchu.rxcache.data.CacheResult;
@@ -16,21 +17,19 @@ import com.zchu.rxcache.stategy.IStrategy;
 
 import java.io.File;
 
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
-import rx.Subscriber;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private GankApi gankApi;
 
     private RxCache rxCache;
-
 
     private Button btnFirstRemote;
     private Button btnFirstCache;
@@ -39,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button btnCacheAndRemote;
     private TextView tvData;
 
-    private Subscription mSubscription;
+    private Disposable mSubscription;
 
 
     @Override
@@ -61,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         gankApi = new Retrofit.Builder()
                 .baseUrl(GankApi.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .client(new OkHttpClient.Builder().build())
                 .build()
                 .create(GankApi.class);
@@ -98,22 +97,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void loadData(IStrategy strategy) {
-        if (mSubscription != null && !mSubscription.isUnsubscribed()) {
-            mSubscription.unsubscribe();
+        if (mSubscription != null && !mSubscription.isDisposed()) {
+            mSubscription.dispose();
         }
         tvData.setText("加载中...");
-        mSubscription = gankApi.getHistoryGank(1)
+        gankApi.getHistoryGank(1)
                 .compose(rxCache.<GankBean>transformer("custom_key", strategy))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<CacheResult<GankBean>>() {
+                .subscribe(new Observer<CacheResult<GankBean>>() {
                     @Override
-                    public void onCompleted() {
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        tvData.setText(e.getMessage());
+                    public void onSubscribe(Disposable d) {
+                        mSubscription = d;
                     }
 
                     @Override
@@ -124,6 +119,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         } else {
                             tvData.setText("来自网络：\n" + gankBeanCacheResult.toString());
                         }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        tvData.setText(e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {
 
                     }
                 });

@@ -1,8 +1,8 @@
 package com.zchu.sample;
 
+import io.reactivex.Observable;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
-import rx.Observable;
 
 /**
  * Created by Chu on 2016/10/25.
