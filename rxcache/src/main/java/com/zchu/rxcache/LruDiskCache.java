@@ -60,7 +60,7 @@ class LruDiskCache {
         DiskLruCache.Editor edit = null;
         InputStream classSource=null;
         try {
-            edit = mDiskLruCache.edit(RxCache.getMD5MessageDigest(key + "CLASS"));
+            edit = mDiskLruCache.edit(toClassKey(key));
 
             if (edit == null) {
                 return null;
@@ -114,7 +114,7 @@ class LruDiskCache {
     private boolean saveClass(String key, Class aClass) {
         OutputStream sink = null;
         try {
-            DiskLruCache.Editor edit = mDiskLruCache.edit(RxCache.getMD5MessageDigest(key + "CLASS"));
+            DiskLruCache.Editor edit = mDiskLruCache.edit(toClassKey(key));
             if (edit == null) {
                 return false;
             }
@@ -139,7 +139,7 @@ class LruDiskCache {
 
     boolean containsKey(String key) {
         try {
-            return mDiskLruCache.get(key) != null;
+            return mDiskLruCache.get(key) != null&&mDiskLruCache.get(toClassKey(key))!=null;
         } catch (IOException e) {
             LogUtils.log(e);
         }
@@ -151,7 +151,7 @@ class LruDiskCache {
      */
     final boolean remove(String key) {
         try {
-            return mDiskLruCache.remove(key);
+            return mDiskLruCache.remove(key)&&mDiskLruCache.remove(toClassKey(key));
         } catch (IOException e) {
             LogUtils.log(e);
         }
@@ -164,6 +164,10 @@ class LruDiskCache {
         } catch (IOException e) {
             LogUtils.log(e);
         }
+    }
+
+    private static String toClassKey(String key){
+        return RxCache.getMD5MessageDigest(key + "CLASS");
     }
 
 

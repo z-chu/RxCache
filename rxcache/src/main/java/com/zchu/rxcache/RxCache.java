@@ -17,7 +17,7 @@ import rx.exceptions.Exceptions;
 
 
 /**
- * RxJava的远程数据缓存处理，目前只支持Serializable
+ * RxJava remote data cache processing library, support Serializable, JSON
  * 作者: 赵成柱 on 2016/9/9 0012.
  */
 public final class RxCache {
