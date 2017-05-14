@@ -28,8 +28,21 @@
 * 仅磁盘
 * 内存+磁盘
 
-## 如何使用
+## 引入
+* **RxJava 2.0**
+```groovy
+dependencies {
+	compile 'com.zchu:rxcache:2.0.0'
+}
+```
+* **RxJava 1.0**
+```groovy
+dependencies {
+	compile 'com.zchu:rxcache:1.2.1'
+}
+```
 
+## 如何使用
 准备RxCache,可以用单例模式创建一个全局的RxCache
 ```java
 rxCache = new RxCache.Builder()
@@ -77,9 +90,4 @@ gankApi.getHistoryGank(1)
 ```
 
 
-### 引入
-```groovy
-dependencies {
-	compile 'com.zchu:rxcache:1.2.1'
-}
-```
+
