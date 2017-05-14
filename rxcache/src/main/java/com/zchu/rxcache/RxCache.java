@@ -11,9 +11,12 @@ import com.zchu.rxcache.utils.LogUtils;
 import java.io.File;
 import java.security.MessageDigest;
 
-import rx.Observable;
-import rx.Subscriber;
-import rx.exceptions.Exceptions;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
+import io.reactivex.ObservableTransformer;
+import io.reactivex.exceptions.Exceptions;
 
 
 /**
@@ -38,34 +41,34 @@ public final class RxCache {
 
     }
 
-    public <T> Observable.Transformer<T, CacheResult<T>> transformer(final String key, final IStrategy strategy) {
-        return new Observable.Transformer<T, CacheResult<T>>() {
+    public <T> ObservableTransformer<T, CacheResult<T>> transformer(final String key, final IStrategy strategy) {
+        return new ObservableTransformer<T, CacheResult<T>>() {
             @Override
-            public Observable<CacheResult<T>> call(Observable<T> tObservable) {
+            public ObservableSource<CacheResult<T>> apply(Observable<T> tObservable) {
                 return strategy.execute(RxCache.this, getMD5MessageDigest(key), tObservable);
             }
         };
     }
 
-    private static abstract class SimpleSubscribe<T> implements rx.Observable.OnSubscribe<T> {
+    private static abstract class SimpleSubscribe<T> implements ObservableOnSubscribe<T> {
         @Override
-        public final void call(Subscriber<? super T> subscriber) {
+        public void subscribe(ObservableEmitter<T> subscriber) throws Exception {
             try {
                 T data = execute();
-                if (!subscriber.isUnsubscribed()) {
+                if (!subscriber.isDisposed()) {
                     subscriber.onNext(data);
                 }
             } catch (Throwable e) {
                 LogUtils.log(e);
                 Exceptions.throwIfFatal(e);
-                if (!subscriber.isUnsubscribed()) {
+                if (!subscriber.isDisposed()) {
                     subscriber.onError(e);
                 }
                 return;
             }
 
-            if (!subscriber.isUnsubscribed()) {
-                subscriber.onCompleted();
+            if (!subscriber.isDisposed()) {
+                subscriber.onComplete();
             }
         }
 
@@ -75,8 +78,8 @@ public final class RxCache {
     /**
      * 读取
      */
-    public <T> rx.Observable<T> load(final String key) {
-        return rx.Observable.create(new SimpleSubscribe<T>() {
+    public <T> Observable<T> load(final String key) {
+        return Observable.create(new SimpleSubscribe<T>() {
             @Override
             T execute() {
                 LogUtils.debug("loadCache  key=" + key);
@@ -88,8 +91,8 @@ public final class RxCache {
     /**
      * 保存
      */
-    public <T> rx.Observable<Boolean> save(final String key, final T value, final CacheTarget target) {
-        return rx.Observable.create(new SimpleSubscribe<Boolean>() {
+    public <T> Observable<Boolean> save(final String key, final T value, final CacheTarget target) {
+        return Observable.create(new SimpleSubscribe<Boolean>() {
             @Override
             Boolean execute() throws Throwable {
                 return cacheCore.save(getMD5MessageDigest(key), value, target);
@@ -117,8 +120,8 @@ public final class RxCache {
     /**
      * 清空缓存
      */
-    public rx.Observable<Boolean> clear() {
-        return rx.Observable.create(new SimpleSubscribe<Boolean>() {
+    public Observable<Boolean> clear() {
+        return Observable.create(new SimpleSubscribe<Boolean>() {
             @Override
             Boolean execute() throws Throwable {
                 cacheCore.clear();

@@ -14,8 +14,6 @@ class CacheCore {
         this.memory = memory;
         this.disk = disk;
     }
-
-
     /**
      * 读取
      */

@@ -4,8 +4,9 @@ import com.zchu.rxcache.CacheTarget;
 import com.zchu.rxcache.RxCache;
 import com.zchu.rxcache.data.CacheResult;
 
-import rx.Observable;
-import rx.functions.Func1;
+import io.reactivex.Observable;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Predicate;
 
 /**
  * 先缓存，后网络
@@ -14,7 +15,6 @@ import rx.functions.Func1;
 class CacheAndRemoteStrategy extends BaseStrategy {
     private CacheAndRemoteStrategy() {
     }
-
     public static CacheAndRemoteStrategy INSTANCE = new CacheAndRemoteStrategy();
 
     @Override
@@ -22,9 +22,9 @@ class CacheAndRemoteStrategy extends BaseStrategy {
         Observable<CacheResult<T>> cache = loadCache(rxCache, key);
         Observable<CacheResult<T>> remote = loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk);
         return Observable.concat(cache, remote)
-                .filter(new Func1<CacheResult<T>, Boolean>() {
+                .filter(new Predicate<CacheResult<T>>() {
                     @Override
-                    public Boolean call(CacheResult<T> result) {
+                    public boolean test(@NonNull CacheResult<T> result) throws Exception {
                         return result!=null&&result.getData() != null;
                     }
                 });
