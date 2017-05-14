@@ -1,4 +1,7 @@
 # RxCache
+
+[ ![Download](https://api.bintray.com/packages/zchu/maven/rxcache/images/download.svg) ](https://bintray.com/zchu/maven/rxcache/_latestVersion)
+
 简单一步，缓存搞定。这是一个专用于RxJava，解决Android中网络请求的缓存处理框架。
 
 <img src="/screenshots/s0.gif" alt="screenshot" title="screenshot" width="270" height="486" />
@@ -77,6 +80,6 @@ gankApi.getHistoryGank(1)
 ### 引入
 ```groovy
 dependencies {
-	compile 'com.zchu:rxcache:1.2.0'
+	compile 'com.zchu:rxcache:1.2.1'
 }
 ```
