@@ -7,6 +7,7 @@ import com.zchu.rxcache.data.ResultFrom;
 import com.zchu.rxcache.utils.LogUtils;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
@@ -20,10 +21,10 @@ abstract class BaseStrategy implements IStrategy {
     <T> Observable<CacheResult<T>> loadCache(final RxCache rxCache, final String key) {
         return rxCache
                 .<T>load(key)
-                .onErrorReturn(new Function<Throwable, T>() {// rxjava 2.0 is not allowed null so if load(key) return null just return Observable.empty()
+                .onErrorResumeNext(new Function<Throwable, ObservableSource<? extends T>>() {
                     @Override
-                    public T apply(@NonNull Throwable throwable) throws Exception {
-                        return (T)Observable.empty();
+                    public ObservableSource<? extends T> apply(@NonNull Throwable throwable) throws Exception {
+                        return Observable.empty();
                     }
                 })
                 .map(new Function<T, CacheResult<T>>() {
