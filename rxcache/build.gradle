@@ -3,13 +3,13 @@ apply plugin: 'com.novoda.bintray-release'
 
 android {
     compileSdkVersion 24
-    buildToolsVersion "25.0.3"
+    buildToolsVersion '25.0.3'
 
     defaultConfig {
         minSdkVersion 11
         targetSdkVersion 24
-        versionCode 4
-        versionName "1.2.1"
+        versionCode 6
+        versionName "1.2.3"
     }
     buildTypes {
         release {
@@ -19,13 +19,12 @@ android {
     }
     lintOptions {
         abortOnError false
-        checkReleaseBuilds false
     }
 
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:25.0.1'
+    compile 'com.android.support:support-v4:24.2.0'
     compile 'io.reactivex:rxandroid:1.2.1'
     compile 'io.reactivex:rxjava:1.3.0'
     compile 'com.jakewharton:disklrucache:+'
@@ -36,7 +35,7 @@ publish{
     userOrg = 'zchu'
     groupId = 'com.zchu'
     artifactId = 'rxcache'
-    publishVersion = '1.2.1'
+    publishVersion = '1.2.3'
     desc = 'This is a cache library for android'
     website = 'https://github.com/z-chu/RxCache'
 }
