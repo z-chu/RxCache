@@ -9,6 +9,7 @@ import com.zchu.rxcache.stategy.IStrategy;
 import com.zchu.rxcache.utils.LogUtils;
 
 import java.io.File;
+import java.lang.reflect.Type;
 import java.security.MessageDigest;
 
 import io.reactivex.Observable;
@@ -41,11 +42,11 @@ public final class RxCache {
 
     }
 
-    public <T> ObservableTransformer<T, CacheResult<T>> transformer(final String key, final IStrategy strategy) {
+    public <T> ObservableTransformer<T, CacheResult<T>> transformer(final String key, final Type type, final IStrategy strategy) {
         return new ObservableTransformer<T, CacheResult<T>>() {
             @Override
             public ObservableSource<CacheResult<T>> apply(Observable<T> tObservable) {
-                return strategy.execute(RxCache.this, getMD5MessageDigest(key), tObservable);
+                return strategy.execute(RxCache.this, getMD5MessageDigest(key), tObservable, type);
             }
         };
     }
@@ -78,12 +79,12 @@ public final class RxCache {
     /**
      * 读取
      */
-    public <T> Observable<T> load(final String key) {
+    public <T> Observable<T> load(final String key,final Type type) {
         return Observable.create(new SimpleSubscribe<T>() {
             @Override
             T execute() {
                 LogUtils.debug("loadCache  key=" + key);
-                return cacheCore.load(getMD5MessageDigest(key));
+                return cacheCore.load(getMD5MessageDigest(key), type);
             }
         });
     }
@@ -178,6 +179,11 @@ public final class RxCache {
          */
         public Builder diskMax(long maxSize) {
             this.diskMaxSize = maxSize;
+            return this;
+        }
+
+        public Builder setDebug(boolean debug) {
+            LogUtils.DEBUG=debug;
             return this;
         }
 

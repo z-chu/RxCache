@@ -3,6 +3,8 @@ package com.zchu.rxcache.stategy;
 import com.zchu.rxcache.RxCache;
 import com.zchu.rxcache.data.CacheResult;
 
+import java.lang.reflect.Type;
+
 import io.reactivex.Observable;
 
 
@@ -17,7 +19,7 @@ import io.reactivex.Observable;
 
 
     @Override
-    public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source) {
-        return loadCache(rxCache,key);
+    public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type) {
+        return loadCache(rxCache,key,type);
     }
 }

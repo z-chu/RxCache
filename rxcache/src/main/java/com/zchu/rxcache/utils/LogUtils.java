@@ -9,7 +9,7 @@ public final class LogUtils {
     private LogUtils() {
     }
 
-    public static boolean DEBUG = true;
+    public static boolean DEBUG =false;
 
     public static void log(Object message) {
         StackTraceElement element = new Throwable().getStackTrace()[1];

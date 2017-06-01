@@ -6,6 +6,8 @@ import com.zchu.rxcache.data.CacheResult;
 import com.zchu.rxcache.data.ResultFrom;
 import com.zchu.rxcache.utils.LogUtils;
 
+import java.lang.reflect.Type;
+
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.annotations.NonNull;
@@ -18,9 +20,9 @@ import io.reactivex.schedulers.Schedulers;
  */
 abstract class BaseStrategy implements IStrategy {
 
-    <T> Observable<CacheResult<T>> loadCache(final RxCache rxCache, final String key) {
+    <T> Observable<CacheResult<T>> loadCache(final RxCache rxCache, final String key,Type type) {
         return rxCache
-                .<T>load(key)
+                .<T>load(key,type)
                 .onErrorResumeNext(new Function<Throwable, ObservableSource<? extends T>>() {
                     @Override
                     public ObservableSource<? extends T> apply(@NonNull Throwable throwable) throws Exception {
@@ -55,5 +57,5 @@ abstract class BaseStrategy implements IStrategy {
     }
 
     @Override
-    public abstract <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source);
+    public abstract <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type);
 }

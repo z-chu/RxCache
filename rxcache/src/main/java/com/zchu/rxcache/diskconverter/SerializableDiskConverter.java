@@ -9,12 +9,13 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Type;
 
 
 public class SerializableDiskConverter implements IDiskConverter {
 
     @Override
-    public <T> T load(InputStream source, Class<T> classOf) {
+    public <T> T load(InputStream source, Type type) {
         T value = null;
         ObjectInputStream oin = null;
         try {
