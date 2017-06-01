@@ -2,6 +2,7 @@ package com.zchu.rxcache.diskconverter;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Type;
 
 /**
  * 通用转换器
@@ -16,7 +17,7 @@ public interface IDiskConverter {
      * @param source
      * @return
      */
-    <T> T  load(InputStream source, Class<T> classOf);
+    <T> T  load(InputStream source, Type type);
 
     /**
      * 写入

@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.gson.reflect.TypeToken;
 import com.zchu.log.Logger;
 import com.zchu.rxcache.RxCache;
 import com.zchu.rxcache.data.CacheResult;
@@ -15,6 +16,7 @@ import com.zchu.rxcache.stategy.CacheStrategy;
 import com.zchu.rxcache.stategy.IStrategy;
 
 import java.io.File;
+import java.util.List;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
@@ -23,6 +25,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -70,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .diskDir(new File(getCacheDir().getPath() + File.separator + "data-cache"))
                 .diskConverter(new GsonDiskConverter())
                 .diskMax(20 * 1024 * 1024)
+                .memoryMax(1*1024*1024)
                 .build();
         Logger.init("RxCache");
     }
@@ -103,12 +107,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         tvData.setText("加载中...");
         mSubscription = gankApi.getHistoryGank(1)
-                .compose(rxCache.<GankBean>transformer("custom_key", strategy))
+                .map(new Func1<GankBean,  List<GankBean.ResultsBean>>() {
+                    @Override
+                    public List<GankBean.ResultsBean> call(GankBean gankBean) {
+                        return gankBean.getResults();
+                    }
+                })
+                .compose(rxCache.<List<GankBean.ResultsBean>>transformer("custom_key", new TypeToken<List<GankBean.ResultsBean>>() {}.getType(), strategy))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<CacheResult<GankBean>>() {
+                .subscribe(new Subscriber<CacheResult<List<GankBean.ResultsBean>>>() {
                     @Override
                     public void onCompleted() {
+
                     }
 
                     @Override
@@ -117,12 +128,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
 
                     @Override
-                    public void onNext(CacheResult<GankBean> gankBeanCacheResult) {
-                        Logger.e(gankBeanCacheResult);
-                        if (gankBeanCacheResult.getFrom() == ResultFrom.Cache) {
-                            tvData.setText("来自缓存：\n" + gankBeanCacheResult.toString());
+                    public void onNext(CacheResult<List<GankBean.ResultsBean>> listCacheResult) {
+                        List<GankBean.ResultsBean> data = listCacheResult.getData();
+                        Logger.e(data);
+                        if (listCacheResult.getFrom() == ResultFrom.Cache) {
+                            tvData.setText("来自缓存：\n" + listCacheResult.toString());
                         } else {
-                            tvData.setText("来自网络：\n" + gankBeanCacheResult.toString());
+                            tvData.setText("来自网络：\n" + listCacheResult.toString());
                         }
 
                     }

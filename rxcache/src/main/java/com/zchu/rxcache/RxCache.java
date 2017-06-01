@@ -9,6 +9,7 @@ import com.zchu.rxcache.stategy.IStrategy;
 import com.zchu.rxcache.utils.LogUtils;
 
 import java.io.File;
+import java.lang.reflect.Type;
 import java.security.MessageDigest;
 
 import rx.Observable;
@@ -38,11 +39,11 @@ public final class RxCache {
 
     }
 
-    public <T> Observable.Transformer<T, CacheResult<T>> transformer(final String key, final IStrategy strategy) {
+    public <T> Observable.Transformer<T, CacheResult<T>> transformer(final String key, final Type type, final IStrategy strategy) {
         return new Observable.Transformer<T, CacheResult<T>>() {
             @Override
             public Observable<CacheResult<T>> call(Observable<T> tObservable) {
-                return strategy.execute(RxCache.this, getMD5MessageDigest(key), tObservable);
+                return strategy.execute(RxCache.this, getMD5MessageDigest(key), tObservable, type);
             }
         };
     }
@@ -75,12 +76,12 @@ public final class RxCache {
     /**
      * 读取
      */
-    public <T> rx.Observable<T> load(final String key) {
-        return rx.Observable.create(new SimpleSubscribe<T>() {
+    public <T> rx.Observable<T> load(final String key, final Type type) {
+        return rx.Observable.unsafeCreate(new SimpleSubscribe<T>() {
             @Override
             T execute() {
                 LogUtils.debug("loadCache  key=" + key);
-                return cacheCore.load(getMD5MessageDigest(key));
+                return cacheCore.load(getMD5MessageDigest(key), type);
             }
         });
     }
@@ -139,6 +140,8 @@ public final class RxCache {
         private int appVersion;
         private File diskDir;
         private IDiskConverter diskConverter;
+        private boolean isDebug;
+
 
         public Builder() {
         }
@@ -175,6 +178,11 @@ public final class RxCache {
          */
         public Builder diskMax(long maxSize) {
             this.diskMaxSize = maxSize;
+            return this;
+        }
+
+        public Builder setDebug(boolean debug) {
+            LogUtils.DEBUG=debug;
             return this;
         }
 

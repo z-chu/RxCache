@@ -4,6 +4,8 @@ import com.zchu.rxcache.CacheTarget;
 import com.zchu.rxcache.RxCache;
 import com.zchu.rxcache.data.CacheResult;
 
+import java.lang.reflect.Type;
+
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -18,8 +20,8 @@ class FirstCacheStrategy extends BaseStrategy {
     public static FirstCacheStrategy INSTANCE = new FirstCacheStrategy();
 
     @Override
-    public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source) {
-        Observable<CacheResult<T>> cache = loadCache(rxCache, key);
+    public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type) {
+        Observable<CacheResult<T>> cache = loadCache(rxCache, key,type);
         cache.onErrorReturn(new Func1<Throwable, CacheResult<T>>() {
             @Override
             public CacheResult<T> call(Throwable throwable) {

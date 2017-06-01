@@ -1,6 +1,8 @@
 package com.zchu.rxcache;
 
 
+import java.lang.reflect.Type;
+
 /**
  * 缓存核心
  * 作者: 赵成柱 on 2016/9/9
@@ -19,7 +21,7 @@ class CacheCore {
     /**
      * 读取
      */
-    <T> T load(String key) {
+    <T> T load(String key, Type type) {
         if (memory != null) {
             T result = memory.load(key, 0);
             if (result != null) {
@@ -28,10 +30,10 @@ class CacheCore {
         }
 
         if (disk != null) {
-            T result = disk.load(key, 0);
+            T result = disk.load(key, 0,type);
             if (result != null) {
-                if(memory!=null){
-                    memory.save(key,result);
+                if (memory != null) {
+                    memory.save(key, result);
                 }
                 return result;
             }
@@ -47,15 +49,15 @@ class CacheCore {
         if (value == null) { //如果要保存的值为空,则删除
             return memory.remove(key) && disk.remove(key);
         }
-
+        boolean save=false;
         if (target.supportMemory() && memory != null) {
-            memory.save(key, value);
+             save = memory.save(key, value);
         }
         if (target.supportDisk() && disk != null) {
             return disk.save(key, value);
         }
 
-        return false;
+        return save;
     }
 
     /**
@@ -84,13 +86,14 @@ class CacheCore {
      * @param key
      */
     boolean remove(String key) {
+        boolean isRemove=false;
         if (memory != null) {
-            return memory.remove(key);
+            isRemove = memory.remove(key);
         }
         if (disk != null) {
             return disk.remove(key);
         }
-        return true;
+        return isRemove;
     }
 
     /**

@@ -4,6 +4,8 @@ import com.zchu.rxcache.RxCache;
 import com.zchu.rxcache.CacheTarget;
 import com.zchu.rxcache.data.CacheResult;
 
+import java.lang.reflect.Type;
+
 import rx.Observable;
 
 /**
@@ -16,7 +18,7 @@ import rx.Observable;
     public static final  OnlyRemoteStrategy INSTANCE=new OnlyRemoteStrategy();
 
     @Override
-    public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source) {
+    public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type) {
         return loadRemote(rxCache,key, source, CacheTarget.MemoryAndDisk);
     }
 }

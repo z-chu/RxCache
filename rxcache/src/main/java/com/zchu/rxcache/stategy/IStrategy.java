@@ -4,6 +4,8 @@ package com.zchu.rxcache.stategy;
 import com.zchu.rxcache.RxCache;
 import com.zchu.rxcache.data.CacheResult;
 
+import java.lang.reflect.Type;
+
 import rx.Observable;
 
 /**
@@ -11,6 +13,6 @@ import rx.Observable;
  */
 public interface IStrategy {
 
-    <T> rx.Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source);
+    <T> rx.Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type);
 
 }
