@@ -32,13 +32,13 @@
 * **RxJava 2.0**
 ```groovy
 dependencies {
-	compile 'com.zchu:rxcache:2.0.1'
+	compile 'com.zchu:rxcache:2.0.2'
 }
 ```
 * **RxJava 1.0**
 ```groovy
 dependencies {
-	compile 'com.zchu:rxcache:1.2.1'
+	compile 'com.zchu:rxcache:1.2.3'
 }
 ```
 
@@ -62,7 +62,7 @@ rxCache = new RxCache.Builder()
 调用示例：
 ```java
 gankApi.getHistoryGank(1)
-                .compose(rxCache.<GankBean>transformer("custom_key", strategy))
+                .compose(rxCache.<GankBean>transformer("custom_key", GankBean.class,strategy))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<CacheResult<GankBean>>() {
@@ -88,6 +88,17 @@ gankApi.getHistoryGank(1)
                 });
 
 ```
-
+泛型：
+```java
+ gankApi.getHistoryGank(1)
+                .map(new Function<GankBean, List<GankBean.ResultsBean>>() {
+                    @Override
+                    public List<GankBean.ResultsBean> apply(@NonNull GankBean gankBean) throws Exception {
+                        return gankBean.getResults();
+                    }
+                })
+                .compose(rxCache.<List<GankBean.ResultsBean>>transformer("custom_key", new TypeToken<List<GankBean.ResultsBean>>() {}.getType(), strategy))
+		...
+```
 
 
