@@ -35,7 +35,7 @@ publish{
     userOrg = 'zchu'
     groupId = 'com.zchu'
     artifactId = 'rxcache'
-    publishVersion = '1.2.3'
+    publishVersion = '1.2.4'
     desc = 'This is a cache library for android'
     website = 'https://github.com/z-chu/RxCache'
 }
