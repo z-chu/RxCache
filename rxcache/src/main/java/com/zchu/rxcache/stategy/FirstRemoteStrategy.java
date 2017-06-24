@@ -19,11 +19,11 @@ final class FirstRemoteStrategy extends BaseStrategy {
     private FirstRemoteStrategy() {
     }
 
-    public static final FirstRemoteStrategy INSTANCE = new FirstRemoteStrategy();
+    static final FirstRemoteStrategy INSTANCE = new FirstRemoteStrategy();
 
     @Override
     public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type) {
-        Observable<CacheResult<T>> cache = loadCache(rxCache, key,type);
+        Observable<CacheResult<T>> cache = loadCache(rxCache, key, type);
         Observable<CacheResult<T>> remote = loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk)
                 .onErrorReturn(new Function<Throwable, CacheResult<T>>() {
                     @Override

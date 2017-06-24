@@ -19,11 +19,11 @@ class FirstCacheStrategy extends BaseStrategy {
     private FirstCacheStrategy() {
     }
 
-    public static FirstCacheStrategy INSTANCE = new FirstCacheStrategy();
+    static FirstCacheStrategy INSTANCE = new FirstCacheStrategy();
 
     @Override
     public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type) {
-        Observable<CacheResult<T>> cache = loadCache(rxCache, key,type);
+        Observable<CacheResult<T>> cache = loadCache(rxCache, key, type);
         cache.onErrorReturn(new Function<Throwable, CacheResult<T>>() {
             @Override
             public CacheResult<T> apply(@NonNull Throwable throwable) throws Exception {

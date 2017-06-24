@@ -17,17 +17,18 @@ import io.reactivex.functions.Predicate;
 class CacheAndRemoteStrategy extends BaseStrategy {
     private CacheAndRemoteStrategy() {
     }
-    public static CacheAndRemoteStrategy INSTANCE = new CacheAndRemoteStrategy();
+
+    static CacheAndRemoteStrategy INSTANCE = new CacheAndRemoteStrategy();
 
     @Override
     public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type) {
-        Observable<CacheResult<T>> cache = loadCache(rxCache, key,type);
+        Observable<CacheResult<T>> cache = loadCache(rxCache, key, type);
         Observable<CacheResult<T>> remote = loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk);
         return Observable.concat(cache, remote)
                 .filter(new Predicate<CacheResult<T>>() {
                     @Override
                     public boolean test(@NonNull CacheResult<T> result) throws Exception {
-                        return result!=null&&result.getData() != null;
+                        return result != null && result.getData() != null;
                     }
                 });
     }

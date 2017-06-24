@@ -30,7 +30,7 @@ class CacheCore {
         }
 
         if (disk != null) {
-            T result = disk.load(key, 0,type);
+            T result = disk.load(key, 0, type);
             if (result != null) {
                 if (memory != null) {
                     memory.save(key, result);
@@ -49,7 +49,7 @@ class CacheCore {
         if (value == null) { //如果要保存的值为空,则删除
             return memory.remove(key) && disk.remove(key);
         }
-        boolean save=false;
+        boolean save = false;
         if (target.supportMemory() && memory != null) {
             save = memory.save(key, value);
         }
@@ -67,15 +67,11 @@ class CacheCore {
      * @return
      */
     boolean containsKey(String key) {
-        if (memory != null) {
-            if (memory.containsKey(key)) {
-                return true;
-            }
+        if (memory != null && memory.containsKey(key)) {
+            return true;
         }
-        if (disk != null) {
-            if (disk.containsKey(key)) {
-                return true;
-            }
+        if (disk != null && disk.containsKey(key)) {
+            return true;
         }
         return false;
     }
@@ -86,7 +82,7 @@ class CacheCore {
      * @param key
      */
     boolean remove(String key) {
-        boolean isRemove=false;
+        boolean isRemove = false;
         if (memory != null) {
             isRemove = memory.remove(key);
         }
