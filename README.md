@@ -15,6 +15,7 @@
 ### 缓存策略-尽可能适应多种使用场景
 * 仅缓存
 * 仅网络
+* 仅网络依然会缓存
 * 优先缓存
 * 优先网络
 * 先缓存后网络
@@ -32,13 +33,13 @@
 * **RxJava 2.0**
 ```groovy
 dependencies {
-	compile 'com.zchu:rxcache:2.0.2'
+	compile 'com.zchu:rxcache:2.0.3'
 }
 ```
 * **RxJava 1.0**
 ```groovy
 dependencies {
-	compile 'com.zchu:rxcache:1.2.3'
+	compile 'com.zchu:rxcache:1.2.4'
 }
 ```
 
