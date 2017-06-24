@@ -14,7 +14,7 @@ import rx.Observable;
  class OnlyCacheStrategy extends BaseStrategy{
     private OnlyCacheStrategy(){}
 
-    public static final  OnlyCacheStrategy INSTANCE=new OnlyCacheStrategy();
+     static final  OnlyCacheStrategy INSTANCE=new OnlyCacheStrategy();
 
 
     @Override

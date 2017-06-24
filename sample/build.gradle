@@ -41,15 +41,10 @@ dependencies {
     compile 'io.reactivex:rxandroid:1.2.1'
     compile 'io.reactivex:rxjava:1.3.0'
 
-
     compile 'com.squareup.okio:okio:1.6.0'
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
 
     compile 'com.zchu:zlog:1.0.0'
-
-
-    //compile project(':rxcache')
-    compile 'com.zchu:rxcache:1.2.3'
-   // compile 'com.zchu:rxcache:2.0.1'
+    compile project(':rxcache')
 
 }

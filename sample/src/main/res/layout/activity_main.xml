@@ -45,6 +45,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="先缓存，后网络" />
+        <Button
+            android:id="@+id/btn_none"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="仅网络" />
     </LinearLayout>
     <TextView
         android:id="@+id/tv_data"

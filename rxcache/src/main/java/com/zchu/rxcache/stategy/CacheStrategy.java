@@ -37,4 +37,11 @@ public final class CacheStrategy {
         return  CacheAndRemoteStrategy.INSTANCE;
     }
 
+    /**
+     * 仅加载网络，不缓存
+     */
+    public static IStrategy none(){
+        return  NoneStrategy.INSTANCE;
+    }
+
 }

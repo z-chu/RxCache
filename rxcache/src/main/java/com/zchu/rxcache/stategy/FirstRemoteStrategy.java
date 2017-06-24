@@ -17,7 +17,7 @@ final class FirstRemoteStrategy extends BaseStrategy {
     private FirstRemoteStrategy() {
     }
 
-    public static final FirstRemoteStrategy INSTANCE = new FirstRemoteStrategy();
+     static final FirstRemoteStrategy INSTANCE = new FirstRemoteStrategy();
 
     @Override
     public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type) {

@@ -15,7 +15,7 @@ import rx.Observable;
  class OnlyRemoteStrategy extends BaseStrategy{
     private OnlyRemoteStrategy(){}
 
-    public static final  OnlyRemoteStrategy INSTANCE=new OnlyRemoteStrategy();
+    static final  OnlyRemoteStrategy INSTANCE=new OnlyRemoteStrategy();
 
     @Override
     public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type) {
