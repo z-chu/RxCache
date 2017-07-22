@@ -20,31 +20,45 @@ import io.reactivex.schedulers.Schedulers;
  */
 abstract class BaseStrategy implements IStrategy {
 
-    <T> Observable<CacheResult<T>> loadCache(final RxCache rxCache, final String key,Type type) {
+    <T> Observable<CacheResult<T>> loadCache(final RxCache rxCache, final String key, Type type, final boolean needEmpty) {
         return rxCache
-                .<T>load(key,type)
+                .<T>load(key, type)
                 .onErrorResumeNext(new Function<Throwable, ObservableSource<? extends T>>() {
                     @Override
                     public ObservableSource<? extends T> apply(@NonNull Throwable throwable) throws Exception {
-                        return Observable.empty();
+                        if (needEmpty) {
+                            return Observable.empty();
+                        } else {
+                            return Observable.error(throwable);
+                        }
                     }
                 })
                 .map(new Function<T, CacheResult<T>>() {
                     @Override
                     public CacheResult<T> apply(@NonNull T o) throws Exception {
                         LogUtils.debug("loadCache result=" + o);
-                        return new CacheResult<>(ResultFrom.Cache, key,  o);
+                        return new CacheResult<>(ResultFrom.Cache, key, o);
                     }
                 });
     }
 
-     <T> Observable<CacheResult<T>> loadRemote(final RxCache rxCache, final String key, Observable<T> source, final CacheTarget target) {
+    <T> Observable<CacheResult<T>> loadRemote(final RxCache rxCache, final String key, Observable<T> source, final CacheTarget target,final boolean needEmpty) {
         return source
+                .onErrorResumeNext(new Function<Throwable, ObservableSource<? extends T>>() {
+                    @Override
+                    public ObservableSource<? extends T> apply(@NonNull Throwable throwable) throws Exception {
+                        if (needEmpty) {
+                            return Observable.empty();
+                        } else {
+                            return Observable.error(throwable);
+                        }
+                    }
+                })
                 .map(new Function<T, CacheResult<T>>() {
                     @Override
                     public CacheResult<T> apply(@NonNull T t) throws Exception {
                         LogUtils.debug("loadRemote result=" + t);
-                        rxCache.save(key, t,target).subscribeOn(Schedulers.io())
+                        rxCache.save(key, t, target).subscribeOn(Schedulers.io())
                                 .subscribe(new Consumer<Boolean>() {
                                     @Override
                                     public void accept(@NonNull Boolean status) throws Exception {

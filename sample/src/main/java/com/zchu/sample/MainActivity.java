@@ -30,7 +30,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-
+    private static final String TAG = "MainActivity";
     private GankApi gankApi;
     private RxCache rxCache;
     private TextView tvData;
@@ -144,6 +144,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void onComplete() {
 
                     }
+
                 });
     }
 }

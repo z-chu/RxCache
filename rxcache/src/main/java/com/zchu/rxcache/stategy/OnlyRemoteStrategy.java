@@ -21,6 +21,6 @@ class OnlyRemoteStrategy extends BaseStrategy {
 
     @Override
     public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type) {
-        return loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk);
+        return loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk,false);
     }
 }

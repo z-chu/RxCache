@@ -79,7 +79,7 @@ public final class RxCache {
     /**
      * 读取
      */
-    public <T> Observable<T> load(final String key,final Type type) {
+    public <T> Observable<T> load(final String key, final Type type) {
         return Observable.create(new SimpleSubscribe<T>() {
             @Override
             T execute() {
@@ -183,7 +183,7 @@ public final class RxCache {
         }
 
         public Builder setDebug(boolean debug) {
-            LogUtils.DEBUG=debug;
+            LogUtils.DEBUG = debug;
             return this;
         }
 
