@@ -48,6 +48,5 @@ dependencies {
 
 
     compile project(':rxcache')
-    //compile 'com.zchu:rxcache:1.2.0'
 
 }

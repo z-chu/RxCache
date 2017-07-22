@@ -8,8 +8,8 @@ android {
     defaultConfig {
         minSdkVersion 11
         targetSdkVersion 24
-        versionCode 4
-        versionName "1.2.1"
+        versionCode 3
+        versionName "2.0.2"
     }
     buildTypes {
         release {
@@ -28,15 +28,15 @@ dependencies {
     compile 'com.android.support:support-v4:25.0.1'
     compile 'io.reactivex.rxjava2:rxjava:2.0.7'
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
-    compile 'com.jakewharton:disklrucache:+'
-    compile 'com.google.code.gson:gson:+'
+    compile 'com.jakewharton:disklrucache:2.0.2'
+    compile 'com.google.code.gson:gson:2.8.1'
 }
 
-publish{
+publish {
     userOrg = 'zchu'
     groupId = 'com.zchu'
     artifactId = 'rxcache'
-    publishVersion = '1.2.1'
+    publishVersion = '2.0.3'
     desc = 'This is a cache library for android'
     website = 'https://github.com/z-chu/RxCache'
 }

@@ -9,7 +9,7 @@ public final class LogUtils {
     private LogUtils() {
     }
 
-    public static boolean DEBUG = true;
+    public static boolean DEBUG =false;
 
     public static void log(Object message) {
         StackTraceElement element = new Throwable().getStackTrace()[1];
@@ -37,7 +37,7 @@ public final class LogUtils {
 
     private static void print(StackTraceElement element, Object message, Throwable error) {
         String className = element.getClassName();
-        className = className.substring(className.lastIndexOf(".") + 1);
+        className = className.substring(className.lastIndexOf('.') + 1);
         String tag = className+'.'+element.getMethodName()+'('+element.getFileName()+':'+element.getLineNumber()+')';
         String text = toString(message);
 
@@ -72,7 +72,7 @@ public final class LogUtils {
             sb.append(e);
             if (! it.hasNext())
                 return sb.append(']').toString();
-            sb.append(',').append('\n').append(' ');
+            sb.append(",\n ");
         }
     }
 

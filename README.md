@@ -15,6 +15,7 @@
 ### 缓存策略-尽可能适应多种使用场景
 * 仅缓存
 * 仅网络
+* 仅网络依然会缓存
 * 优先缓存
 * 优先网络
 * 先缓存后网络
@@ -28,8 +29,21 @@
 * 仅磁盘
 * 内存+磁盘
 
-## 如何使用
+## 引入
+* **RxJava 2.0**
+```groovy
+dependencies {
+	compile 'com.zchu:rxcache:2.0.3'
+}
+```
+* **RxJava 1.0**
+```groovy
+dependencies {
+	compile 'com.zchu:rxcache:1.2.4'
+}
+```
 
+## 如何使用
 准备RxCache,可以用单例模式创建一个全局的RxCache
 ```java
 rxCache = new RxCache.Builder()
@@ -49,7 +63,7 @@ rxCache = new RxCache.Builder()
 调用示例：
 ```java
 gankApi.getHistoryGank(1)
-                .compose(rxCache.<GankBean>transformer("custom_key", strategy))
+                .compose(rxCache.<GankBean>transformer("custom_key", GankBean.class,strategy))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<CacheResult<GankBean>>() {
@@ -75,11 +89,17 @@ gankApi.getHistoryGank(1)
                 });
 
 ```
-
-
-### 引入
-```groovy
-dependencies {
-	compile 'com.zchu:rxcache:1.2.1'
-}
+泛型：
+```java
+ gankApi.getHistoryGank(1)
+                .map(new Function<GankBean, List<GankBean.ResultsBean>>() {
+                    @Override
+                    public List<GankBean.ResultsBean> apply(@NonNull GankBean gankBean) throws Exception {
+                        return gankBean.getResults();
+                    }
+                })
+                .compose(rxCache.<List<GankBean.ResultsBean>>transformer("custom_key", new TypeToken<List<GankBean.ResultsBean>>() {}.getType(), strategy))
+		...
 ```
+
+

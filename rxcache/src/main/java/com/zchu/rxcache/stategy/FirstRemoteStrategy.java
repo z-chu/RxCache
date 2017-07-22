@@ -4,6 +4,8 @@ import com.zchu.rxcache.CacheTarget;
 import com.zchu.rxcache.RxCache;
 import com.zchu.rxcache.data.CacheResult;
 
+import java.lang.reflect.Type;
+
 import io.reactivex.Observable;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Function;
@@ -17,11 +19,11 @@ final class FirstRemoteStrategy extends BaseStrategy {
     private FirstRemoteStrategy() {
     }
 
-    public static final FirstRemoteStrategy INSTANCE = new FirstRemoteStrategy();
+    static final FirstRemoteStrategy INSTANCE = new FirstRemoteStrategy();
 
     @Override
-    public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source) {
-        Observable<CacheResult<T>> cache = loadCache(rxCache, key);
+    public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type) {
+        Observable<CacheResult<T>> cache = loadCache(rxCache, key, type);
         Observable<CacheResult<T>> remote = loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk)
                 .onErrorReturn(new Function<Throwable, CacheResult<T>>() {
                     @Override

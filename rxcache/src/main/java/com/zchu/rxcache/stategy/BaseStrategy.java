@@ -6,7 +6,10 @@ import com.zchu.rxcache.data.CacheResult;
 import com.zchu.rxcache.data.ResultFrom;
 import com.zchu.rxcache.utils.LogUtils;
 
+import java.lang.reflect.Type;
+
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
@@ -17,13 +20,13 @@ import io.reactivex.schedulers.Schedulers;
  */
 abstract class BaseStrategy implements IStrategy {
 
-    <T> Observable<CacheResult<T>> loadCache(final RxCache rxCache, final String key) {
+    <T> Observable<CacheResult<T>> loadCache(final RxCache rxCache, final String key,Type type) {
         return rxCache
-                .<T>load(key)
-                .onErrorReturn(new Function<Throwable, T>() {// rxjava 2.0 is not allowed null so if load(key) return null just return Observable.empty()
+                .<T>load(key,type)
+                .onErrorResumeNext(new Function<Throwable, ObservableSource<? extends T>>() {
                     @Override
-                    public T apply(@NonNull Throwable throwable) throws Exception {
-                        return (T)Observable.empty();
+                    public ObservableSource<? extends T> apply(@NonNull Throwable throwable) throws Exception {
+                        return Observable.empty();
                     }
                 })
                 .map(new Function<T, CacheResult<T>>() {
@@ -54,5 +57,5 @@ abstract class BaseStrategy implements IStrategy {
     }
 
     @Override
-    public abstract <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source);
+    public abstract <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type);
 }
