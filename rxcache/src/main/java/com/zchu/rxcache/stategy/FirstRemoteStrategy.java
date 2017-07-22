@@ -7,9 +7,6 @@ import com.zchu.rxcache.data.CacheResult;
 import java.lang.reflect.Type;
 
 import io.reactivex.Observable;
-import io.reactivex.annotations.NonNull;
-import io.reactivex.functions.Function;
-import io.reactivex.functions.Predicate;
 
 /**
  * 优先网络
@@ -23,20 +20,8 @@ final class FirstRemoteStrategy extends BaseStrategy {
 
     @Override
     public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type) {
-        Observable<CacheResult<T>> cache = loadCache(rxCache, key, type);
-        Observable<CacheResult<T>> remote = loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk)
-                .onErrorReturn(new Function<Throwable, CacheResult<T>>() {
-                    @Override
-                    public CacheResult<T> apply(@NonNull Throwable throwable) throws Exception {
-                        return null;
-                    }
-                });
-        return Observable.concat(remote, cache)
-                .filter(new Predicate<CacheResult<T>>() {
-                    @Override
-                    public boolean test(@NonNull CacheResult<T> result) throws Exception {
-                        return result != null && result.getData() != null;
-                    }
-                }).firstElement().toObservable();
+        Observable<CacheResult<T>> cache = loadCache(rxCache, key, type, false);
+        Observable<CacheResult<T>> remote = loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk, true);
+        return remote.switchIfEmpty(cache);
     }
 }

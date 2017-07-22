@@ -21,6 +21,6 @@ class OnlyCacheStrategy extends BaseStrategy {
 
     @Override
     public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type) {
-        return loadCache(rxCache, key, type);
+        return loadCache(rxCache, key, type,false);
     }
 }

@@ -22,8 +22,8 @@ class CacheAndRemoteStrategy extends BaseStrategy {
 
     @Override
     public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type) {
-        Observable<CacheResult<T>> cache = loadCache(rxCache, key, type);
-        Observable<CacheResult<T>> remote = loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk);
+        Observable<CacheResult<T>> cache = loadCache(rxCache, key, type,true);
+        Observable<CacheResult<T>> remote = loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk,true);
         return Observable.concat(cache, remote)
                 .filter(new Predicate<CacheResult<T>>() {
                     @Override
