@@ -10,10 +10,10 @@ public final class CacheStrategy {
     private static FirstCacheStrategy sFirstCacheStrategy;
     private static FirstCacheStrategy sFirstCacheSyncStrategy;
     private static OnlyRemoteStrategy sOnlyRemoteStrategy;
-    private static OnlyRemoteStrategy sOnlyRemoteSycnStrategy;
+    private static OnlyRemoteStrategy sOnlyRemoteSyncStrategy;
     private static OnlyCacheStrategy sOnlyCacheStrategy;
     private static CacheAndRemoteStrategy sCacheAndRemoteStrategy;
-    private static CacheAndRemoteStrategy sCacheAndRemoteSycnStrategy;
+    private static CacheAndRemoteStrategy sCacheAndRemoteSyncStrategy;
 
 
     /**
@@ -70,10 +70,10 @@ public final class CacheStrategy {
      * 仅加载网络，但数据依然会被缓存
      */
     public static IStrategy onlyRemoteSync() {
-        if (sOnlyRemoteSycnStrategy == null) {
-            sOnlyRemoteSycnStrategy = new OnlyRemoteStrategy(true);
+        if (sOnlyRemoteSyncStrategy == null) {
+            sOnlyRemoteSyncStrategy = new OnlyRemoteStrategy(true);
         }
-        return sOnlyRemoteSycnStrategy;
+        return sOnlyRemoteSyncStrategy;
     }
 
     /**
@@ -100,10 +100,10 @@ public final class CacheStrategy {
      * 先加载缓存，后加载网络，缓存用同步的方式保存
      */
     public static IStrategy cacheAndRemoteSync() {
-        if(sCacheAndRemoteSycnStrategy==null){
-            sCacheAndRemoteSycnStrategy=new CacheAndRemoteStrategy(true);
+        if(sCacheAndRemoteSyncStrategy ==null){
+            sCacheAndRemoteSyncStrategy =new CacheAndRemoteStrategy(true);
         }
-        return sCacheAndRemoteSycnStrategy;
+        return sCacheAndRemoteSyncStrategy;
     }
 
     /**
