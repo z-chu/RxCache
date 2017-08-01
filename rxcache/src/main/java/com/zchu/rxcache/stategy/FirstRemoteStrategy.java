@@ -13,16 +13,29 @@ import rx.functions.Func1;
  * 优先网络
  * 作者: 赵成柱 on 2016/9/12 0012.
  */
-final class FirstRemoteStrategy extends BaseStrategy {
-    private FirstRemoteStrategy() {
+public final class FirstRemoteStrategy extends BaseStrategy {
+    private boolean isSync;
+
+    public FirstRemoteStrategy() {
+        isSync = false;
     }
 
-     static final FirstRemoteStrategy INSTANCE = new FirstRemoteStrategy();
+    public FirstRemoteStrategy(boolean isSync) {
+        this.isSync = isSync;
+    }
+
+    static final FirstRemoteStrategy INSTANCE = new FirstRemoteStrategy();
 
     @Override
     public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type) {
-        Observable<CacheResult<T>> cache = loadCache(rxCache, key,type);
-        Observable<CacheResult<T>> remote = loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk)
+        Observable<CacheResult<T>> cache = loadCache(rxCache, key, type);
+        Observable<CacheResult<T>> remote;
+        if (isSync) {
+            remote = loadRemoteSync(rxCache, key, source, CacheTarget.MemoryAndDisk);
+        } else {
+            remote = loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk);
+        }
+        remote = remote
                 .onErrorReturn(new Func1<Throwable, CacheResult<T>>() {
                     @Override
                     public CacheResult<T> call(Throwable throwable) {

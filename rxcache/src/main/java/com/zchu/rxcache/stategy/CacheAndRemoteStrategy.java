@@ -13,8 +13,15 @@ import rx.functions.Func1;
  * 先缓存，后网络
  * 作者: 赵成柱 on 2016/9/12 0012.
  */
-class CacheAndRemoteStrategy extends BaseStrategy {
-    private CacheAndRemoteStrategy() {
+public final class CacheAndRemoteStrategy extends BaseStrategy {
+    private boolean isSync;
+
+    public CacheAndRemoteStrategy() {
+        isSync = false;
+    }
+
+    public CacheAndRemoteStrategy(boolean isSync) {
+        this.isSync = isSync;
     }
 
     static CacheAndRemoteStrategy INSTANCE = new CacheAndRemoteStrategy();
@@ -23,7 +30,12 @@ class CacheAndRemoteStrategy extends BaseStrategy {
     @Override
     public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type) {
         Observable<CacheResult<T>> cache = loadCache(rxCache, key, type);
-        Observable<CacheResult<T>> remote = loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk);
+        Observable<CacheResult<T>> remote;
+        if (isSync) {
+            remote = loadRemoteSync(rxCache, key, source, CacheTarget.MemoryAndDisk);
+        } else {
+            remote = loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk);
+        }
         return Observable.concat(cache, remote)
                 .filter(new Func1<CacheResult<T>, Boolean>() {
                     @Override

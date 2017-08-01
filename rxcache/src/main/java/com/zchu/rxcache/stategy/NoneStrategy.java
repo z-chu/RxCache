@@ -14,7 +14,7 @@ import rx.functions.Func1;
  * 仅加载网络，不缓存
  */
 
- class NoneStrategy implements IStrategy {
+ public final class NoneStrategy implements IStrategy {
 
     private NoneStrategy(){}
 

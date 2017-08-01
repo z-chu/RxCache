@@ -13,8 +13,15 @@ import rx.functions.Func1;
  * 优先缓存
  * 作者: 赵成柱 on 2016/9/12 0012.
  */
-class FirstCacheStrategy extends BaseStrategy {
-    private FirstCacheStrategy() {
+public final class FirstCacheStrategy extends BaseStrategy {
+    private boolean isSync;
+
+    public FirstCacheStrategy() {
+        isSync = false;
+    }
+
+    public FirstCacheStrategy(boolean isSync) {
+        this.isSync = isSync;
     }
 
     static FirstCacheStrategy INSTANCE = new FirstCacheStrategy();
@@ -28,7 +35,12 @@ class FirstCacheStrategy extends BaseStrategy {
                 return null;
             }
         });
-        Observable<CacheResult<T>> remote = loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk);
+        Observable<CacheResult<T>> remote;
+        if (isSync) {
+            remote = loadRemoteSync(rxCache, key, source, CacheTarget.MemoryAndDisk);
+        } else {
+            remote = loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk);
+        }
         return Observable.concat(cache, remote)
                 .firstOrDefault(null, new Func1<CacheResult<T>, Boolean>() {
                     @Override

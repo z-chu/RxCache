@@ -11,14 +11,13 @@ import rx.Observable;
  * 仅加载缓存
  * 作者: 赵成柱 on 2016/9/12 0012.
  */
- class OnlyCacheStrategy extends BaseStrategy{
-    private OnlyCacheStrategy(){}
+public final class OnlyCacheStrategy extends BaseStrategy {
 
-     static final  OnlyCacheStrategy INSTANCE=new OnlyCacheStrategy();
+    static final OnlyCacheStrategy INSTANCE = new OnlyCacheStrategy();
 
 
     @Override
     public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type) {
-        return loadCache(rxCache,key,type);
+        return loadCache(rxCache, key, type);
     }
 }
