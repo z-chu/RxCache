@@ -12,16 +12,26 @@ import io.reactivex.Observable;
  * 优先网络
  * 作者: 赵成柱 on 2016/9/12 0012.
  */
-final class FirstRemoteStrategy extends BaseStrategy {
-    private FirstRemoteStrategy() {
+public final class FirstRemoteStrategy extends BaseStrategy {
+    private boolean isSync;
+
+    public FirstRemoteStrategy() {
+        isSync = false;
     }
 
-    static final FirstRemoteStrategy INSTANCE = new FirstRemoteStrategy();
+    public FirstRemoteStrategy(boolean isSync) {
+        this.isSync = isSync;
+    }
 
     @Override
     public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type) {
         Observable<CacheResult<T>> cache = loadCache(rxCache, key, type, false);
-        Observable<CacheResult<T>> remote = loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk, true);
+        Observable<CacheResult<T>> remote;
+        if (isSync) {
+            remote = loadRemoteSync(rxCache, key, source, CacheTarget.MemoryAndDisk, true);
+        } else {
+            remote = loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk, true);
+        }
         return remote.switchIfEmpty(cache);
     }
 }

@@ -12,16 +12,26 @@ import io.reactivex.Observable;
  * 优先缓存
  * 作者: 赵成柱 on 2016/9/12 0012.
  */
-class FirstCacheStrategy extends BaseStrategy {
-    private FirstCacheStrategy() {
+public final class FirstCacheStrategy extends BaseStrategy {
+    private boolean isSync;
+
+    public FirstCacheStrategy() {
+        isSync = false;
     }
 
-    static FirstCacheStrategy INSTANCE = new FirstCacheStrategy();
+    public FirstCacheStrategy(boolean isSync) {
+        this.isSync = isSync;
+    }
 
     @Override
     public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type) {
         Observable<CacheResult<T>> cache = loadCache(rxCache, key, type,true);
-        Observable<CacheResult<T>> remote = loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk,false);
+        Observable<CacheResult<T>> remote;
+        if (isSync) {
+            remote = loadRemoteSync(rxCache, key, source, CacheTarget.MemoryAndDisk,false);
+        } else {
+            remote = loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk,false);
+        }
         return cache.switchIfEmpty(remote);
     }
 }

@@ -216,6 +216,7 @@ public final class RxCache {
                 // Target 2% of the total space.
                 size = available / 50;
             } catch (IllegalArgumentException ignored) {
+                LogUtils.log(ignored);
             }
             // Bound inside min/max size for disk cache.
             return Math.max(Math.min(size, MAX_DISK_CACHE_SIZE), MIN_DISK_CACHE_SIZE);
@@ -232,14 +233,14 @@ public final class RxCache {
             int j = md.length;
             char str[] = new char[j * 2];
             int k = 0;
-            for (int i = 0; i < j; i++) {
-                byte byte0 = md[i];
+            for (byte byte0 : md) {
                 str[k++] = hexDigits[byte0 >>> 4 & 0xf];
                 str[k++] = hexDigits[byte0 & 0xf];
             }
             return new String(str);
         } catch (Exception e) {
-            return null;
+            LogUtils.log(e);
+            return buffer;
         }
     }
 

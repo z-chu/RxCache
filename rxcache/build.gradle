@@ -2,14 +2,14 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.novoda.bintray-release'
 
 android {
-    compileSdkVersion 24
+    compileSdkVersion 25
     buildToolsVersion "25.0.3"
 
     defaultConfig {
         minSdkVersion 11
-        targetSdkVersion 24
+        targetSdkVersion 25
         versionCode 3
-        versionName "2.0.2"
+        versionName "2.0.4"
     }
     buildTypes {
         release {
@@ -25,7 +25,7 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:25.0.1'
+    compile 'com.android.support:support-v4:25.3.1'
     compile 'io.reactivex.rxjava2:rxjava:2.0.7'
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
     compile 'com.jakewharton:disklrucache:2.0.2'
@@ -36,7 +36,7 @@ publish {
     userOrg = 'zchu'
     groupId = 'com.zchu'
     artifactId = 'rxcache'
-    publishVersion = '2.0.3'
+    publishVersion = '2.0.4'
     desc = 'This is a cache library for android'
     website = 'https://github.com/z-chu/RxCache'
 }

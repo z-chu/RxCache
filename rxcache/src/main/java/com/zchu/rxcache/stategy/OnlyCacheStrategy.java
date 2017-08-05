@@ -12,12 +12,7 @@ import io.reactivex.Observable;
  * 仅加载缓存
  * 作者: 赵成柱 on 2016/9/12 0012.
  */
-class OnlyCacheStrategy extends BaseStrategy {
-    private OnlyCacheStrategy() {
-    }
-
-    static final OnlyCacheStrategy INSTANCE = new OnlyCacheStrategy();
-
+public final class OnlyCacheStrategy extends BaseStrategy {
 
     @Override
     public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type) {

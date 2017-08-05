@@ -14,13 +14,22 @@ import io.reactivex.Observable;
  * 作者: 赵成柱 on 2016/9/12 0012.
  */
 class OnlyRemoteStrategy extends BaseStrategy {
-    private OnlyRemoteStrategy() {
+    private boolean isSync;
+
+    public OnlyRemoteStrategy() {
+        isSync = false;
     }
 
-    static final OnlyRemoteStrategy INSTANCE = new OnlyRemoteStrategy();
+    public OnlyRemoteStrategy(boolean isSync) {
+        this.isSync = isSync;
+    }
 
     @Override
     public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type) {
-        return loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk,false);
+        if (isSync) {
+            return loadRemoteSync(rxCache, key, source, CacheTarget.MemoryAndDisk, false);
+        } else {
+            return loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk, false);
+        }
     }
 }

@@ -14,16 +14,26 @@ import io.reactivex.functions.Predicate;
  * 先缓存，后网络
  * 作者: 赵成柱 on 2016/9/12 0012.
  */
-class CacheAndRemoteStrategy extends BaseStrategy {
-    private CacheAndRemoteStrategy() {
+public final class CacheAndRemoteStrategy extends BaseStrategy {
+    private boolean isSync;
+
+    public CacheAndRemoteStrategy() {
+        isSync = false;
     }
 
-    static CacheAndRemoteStrategy INSTANCE = new CacheAndRemoteStrategy();
+    public CacheAndRemoteStrategy(boolean isSync) {
+        this.isSync = isSync;
+    }
 
     @Override
     public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type) {
         Observable<CacheResult<T>> cache = loadCache(rxCache, key, type,true);
-        Observable<CacheResult<T>> remote = loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk,true);
+        Observable<CacheResult<T>> remote;
+        if (isSync) {
+            remote = loadRemoteSync(rxCache, key, source, CacheTarget.MemoryAndDisk,true);
+        } else {
+            remote = loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk,true);
+        }
         return Observable.concat(cache, remote)
                 .filter(new Predicate<CacheResult<T>>() {
                     @Override
