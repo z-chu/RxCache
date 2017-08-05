@@ -33,13 +33,13 @@
 * **RxJava 2.0**
 ```groovy
 dependencies {
-	compile 'com.zchu:rxcache:2.0.3'
+	compile 'com.zchu:rxcache:2.0.4'
 }
 ```
 * **RxJava 1.0**
 ```groovy
 dependencies {
-	compile 'com.zchu:rxcache:1.2.4'
+	compile 'com.zchu:rxcache:1.2.5'
 }
 ```
 
