@@ -24,8 +24,6 @@ public final class FirstCacheStrategy extends BaseStrategy {
         this.isSync = isSync;
     }
 
-    static FirstCacheStrategy INSTANCE = new FirstCacheStrategy();
-
     @Override
     public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type) {
         Observable<CacheResult<T>> cache = loadCache(rxCache, key, type);

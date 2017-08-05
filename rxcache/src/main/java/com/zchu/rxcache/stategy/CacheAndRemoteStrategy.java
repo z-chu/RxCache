@@ -24,9 +24,6 @@ public final class CacheAndRemoteStrategy extends BaseStrategy {
         this.isSync = isSync;
     }
 
-    static CacheAndRemoteStrategy INSTANCE = new CacheAndRemoteStrategy();
-
-
     @Override
     public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type) {
         Observable<CacheResult<T>> cache = loadCache(rxCache, key, type);

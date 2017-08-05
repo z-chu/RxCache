@@ -45,6 +45,7 @@ dependencies {
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
 
     compile 'com.zchu:zlog:1.0.0'
-    compile project(':rxcache')
+    compile 'com.zchu:rxcache:1.2.5'
+   // compile project(':rxcache')
 
 }

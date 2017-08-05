@@ -24,8 +24,6 @@ public final class OnlyRemoteStrategy extends BaseStrategy {
         this.isSync = isSync;
     }
 
-    static final OnlyRemoteStrategy INSTANCE = new OnlyRemoteStrategy();
-
     @Override
     public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type) {
         if (isSync) {
