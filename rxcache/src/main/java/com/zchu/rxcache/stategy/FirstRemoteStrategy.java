@@ -26,27 +26,22 @@ public final class FirstRemoteStrategy extends BaseStrategy {
 
     @Override
     public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type) {
-        Observable<CacheResult<T>> cache = loadCache(rxCache, key, type);
         Observable<CacheResult<T>> remote;
         if (isSync) {
             remote = loadRemoteSync(rxCache, key, source, CacheTarget.MemoryAndDisk);
         } else {
             remote = loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk);
         }
-        remote = remote
-                .onErrorReturn(new Func1<Throwable, CacheResult<T>>() {
-                    @Override
-                    public CacheResult<T> call(Throwable throwable) {
-                        return null;
-                    }
-                });
-        return Observable.concat(remote, cache)
-                .firstOrDefault(null, new Func1<CacheResult<T>, Boolean>() {
-                    @Override
-                    public Boolean call(CacheResult<T> result) {
-                        return result != null && result.getData() != null;
-                    }
-                });
+        Observable<CacheResult<T>> cache = loadCache(rxCache, key, type);
+        cache=cache.filter(new Func1<CacheResult<T>, Boolean>() {
+            @Override
+            public Boolean call(CacheResult<T> result) {
+                return result != null && result.getData() != null;
+            }
+        });
+        return Observable
+                .concatDelayError(remote, cache)
+                .take(1);
 
     }
 }

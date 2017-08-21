@@ -27,10 +27,10 @@ public final class FirstCacheStrategy extends BaseStrategy {
     @Override
     public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type) {
         Observable<CacheResult<T>> cache = loadCache(rxCache, key, type);
-        cache.onErrorReturn(new Func1<Throwable, CacheResult<T>>() {
+        cache = cache.filter(new Func1<CacheResult<T>, Boolean>() {
             @Override
-            public CacheResult<T> call(Throwable throwable) {
-                return null;
+            public Boolean call(CacheResult<T> result) {
+                return result != null && result.getData() != null;
             }
         });
         Observable<CacheResult<T>> remote;
@@ -39,12 +39,8 @@ public final class FirstCacheStrategy extends BaseStrategy {
         } else {
             remote = loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk);
         }
-        return Observable.concat(cache, remote)
-                .firstOrDefault(null, new Func1<CacheResult<T>, Boolean>() {
-                    @Override
-                    public Boolean call(CacheResult<T> result) {
-                        return result != null && result.getData() != null;
-                    }
-                });
+        return Observable
+                .concat(cache, remote)
+                .take(1);
     }
 }
