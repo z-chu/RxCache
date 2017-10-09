@@ -8,10 +8,14 @@ import com.zchu.rxcache.diskconverter.SerializableDiskConverter;
 import com.zchu.rxcache.stategy.IStrategy;
 import com.zchu.rxcache.utils.LogUtils;
 
+import org.reactivestreams.Publisher;
+
 import java.io.File;
 import java.lang.reflect.Type;
 import java.security.MessageDigest;
 
+import io.reactivex.Flowable;
+import io.reactivex.FlowableTransformer;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -42,7 +46,12 @@ public final class RxCache {
 
     }
 
-    public <T> ObservableTransformer<T, CacheResult<T>> transformer(final String key, final Type type, final IStrategy strategy) {
+    @Deprecated
+    public <T> ObservableTransformer<T, CacheResult<T>> transformer(String key, Type type, IStrategy strategy) {
+        return transformObservable(key, type, strategy);
+    }
+
+    public <T> ObservableTransformer<T, CacheResult<T>> transformObservable(final String key, final Type type, final IStrategy strategy) {
         return new ObservableTransformer<T, CacheResult<T>>() {
             @Override
             public ObservableSource<CacheResult<T>> apply(Observable<T> tObservable) {
@@ -51,6 +60,14 @@ public final class RxCache {
         };
     }
 
+    public <T> FlowableTransformer<T, CacheResult<T>> transformFlowable(final String key, final Type type, final IStrategy strategy) {
+        return new FlowableTransformer<T, CacheResult<T>>() {
+            @Override
+            public Publisher<CacheResult<T>> apply(Flowable<T> flowable) {
+                return strategy.flow(RxCache.this, getMD5MessageDigest(key), flowable, type);
+            }
+        };
+    }
     private static abstract class SimpleSubscribe<T> implements ObservableOnSubscribe<T> {
         @Override
         public void subscribe(ObservableEmitter<T> subscriber) throws Exception {

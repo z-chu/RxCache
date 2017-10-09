@@ -4,8 +4,11 @@ import com.zchu.rxcache.CacheTarget;
 import com.zchu.rxcache.RxCache;
 import com.zchu.rxcache.data.CacheResult;
 
+import org.reactivestreams.Publisher;
+
 import java.lang.reflect.Type;
 
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 
 
@@ -31,5 +34,10 @@ class OnlyRemoteStrategy extends BaseStrategy {
         } else {
             return loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk, false);
         }
+    }
+
+    @Override
+    public <T> Publisher<CacheResult<T>> flow(RxCache rxCache, String key, Flowable<T> source, Type type) {
+        return null;
     }
 }
