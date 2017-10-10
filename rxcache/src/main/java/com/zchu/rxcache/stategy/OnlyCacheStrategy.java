@@ -1,6 +1,7 @@
 package com.zchu.rxcache.stategy;
 
 import com.zchu.rxcache.RxCache;
+import com.zchu.rxcache.RxCacheHelper;
 import com.zchu.rxcache.data.CacheResult;
 
 import org.reactivestreams.Publisher;
@@ -19,11 +20,11 @@ public final class OnlyCacheStrategy extends BaseStrategy {
 
     @Override
     public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type) {
-        return loadCache(rxCache, key, type,false);
+        return RxCacheHelper.loadCache(rxCache, key, type,false);
     }
 
     @Override
     public <T> Publisher<CacheResult<T>> flow(RxCache rxCache, String key, Flowable<T> source, Type type) {
-        return null;
+        return RxCacheHelper.loadCacheFlowable(rxCache, key, type,false);
     }
 }

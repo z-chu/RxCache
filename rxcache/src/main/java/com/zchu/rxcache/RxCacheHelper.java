@@ -26,46 +26,37 @@ import io.reactivex.schedulers.Schedulers;
 public class RxCacheHelper {
 
     public static <T> Observable<CacheResult<T>> loadCache(final RxCache rxCache, final String key, Type type, final boolean needEmpty) {
-        return rxCache
+        Observable<CacheResult<T>> observable = rxCache
                 .<T>load(key, type)
-                .onErrorResumeNext(new Function<Throwable, ObservableSource<? extends T>>() {
+                .flatMap(new Function<T, ObservableSource<CacheResult<T>>>() {
                     @Override
-                    public ObservableSource<? extends T> apply(@NonNull Throwable throwable) throws Exception {
-                        if (needEmpty) {
-                            return Observable.empty();
-                        } else {
-                            return Observable.error(throwable);
+                    public ObservableSource<CacheResult<T>> apply(@NonNull T t) throws Exception {
+                        if (t == null) {
+                            return Observable.error(new NullPointerException("Not find the key corresponding to the cache"));
                         }
-                    }
-                })
-                .map(new Function<T, CacheResult<T>>() {
-                    @Override
-                    public CacheResult<T> apply(@NonNull T o) throws Exception {
-                        LogUtils.debug("loadCache result=" + o);
-                        return new CacheResult<>(ResultFrom.Cache, key, o);
+                        return Observable.just(new CacheResult<>(ResultFrom.Cache, key, t));
                     }
                 });
+        if (needEmpty) {
+            observable = observable
+                    .onErrorResumeNext(new Function<Throwable, ObservableSource<? extends CacheResult<T>>>() {
+                        @Override
+                        public ObservableSource<? extends CacheResult<T>> apply(@NonNull Throwable throwable) throws Exception {
+                            return Observable.empty();
+                        }
+                    });
+        }
+        return observable;
     }
 
     public static <T> Observable<CacheResult<T>> loadRemote(final RxCache rxCache, final String key, Observable<T> source, final CacheTarget target, final boolean needEmpty) {
-        return source
-                .onErrorResumeNext(new Function<Throwable, ObservableSource<? extends T>>() {
-                    @Override
-                    public ObservableSource<? extends T> apply(@NonNull Throwable throwable) throws Exception {
-                        if (needEmpty) {
-                            return Observable.empty();
-                        } else {
-                            return Observable.error(throwable);
-                        }
-                    }
-                })
+        Observable<CacheResult<T>> observable = source
                 .map(new Function<T, CacheResult<T>>() {
                     @Override
                     public CacheResult<T> apply(@NonNull T t) throws Exception {
                         LogUtils.debug("loadRemote result=" + t);
                         rxCache.save(key, t, target)
                                 .subscribeOn(Schedulers.io())
-
                                 .subscribe(
                                         new Consumer<Boolean>() {
                                             @Override
@@ -86,27 +77,37 @@ public class RxCacheHelper {
                         return new CacheResult<>(ResultFrom.Remote, key, t);
                     }
                 });
+        if (needEmpty) {
+            observable = observable
+                    .onErrorResumeNext(new Function<Throwable, ObservableSource<? extends CacheResult<T>>>() {
+                        @Override
+                        public ObservableSource<? extends CacheResult<T>> apply(@NonNull Throwable throwable) throws Exception {
+                            return Observable.empty();
+                        }
+                    });
+        }
+        return observable;
     }
 
 
     public static <T> Observable<CacheResult<T>> loadRemoteSync(final RxCache rxCache, final String key, Observable<T> source, final CacheTarget target, final boolean needEmpty) {
-        return source
-                .onErrorResumeNext(new Function<Throwable, ObservableSource<? extends T>>() {
-                    @Override
-                    public ObservableSource<? extends T> apply(@NonNull Throwable throwable) throws Exception {
-                        if (needEmpty) {
-                            return Observable.empty();
-                        } else {
-                            return Observable.error(throwable);
-                        }
-                    }
-                })
+        Observable<CacheResult<T>> observable = source
                 .flatMap(new Function<T, ObservableSource<CacheResult<T>>>() {
                     @Override
                     public ObservableSource<CacheResult<T>> apply(@NonNull T t) throws Exception {
                         return saveCacheSync(rxCache, key, t, target);
                     }
                 });
+        if (needEmpty) {
+            observable = observable.onErrorResumeNext(new Function<Throwable, ObservableSource<? extends CacheResult<T>>>() {
+                @Override
+                public ObservableSource<? extends CacheResult<T>> apply(@NonNull Throwable throwable) throws Exception {
+                    return Observable.empty();
+                }
+            });
+        }
+        return observable;
+
     }
 
     public static <T> Observable<CacheResult<T>> saveCacheSync(RxCache rxCache, final String key, final T t, CacheTarget target) {
@@ -125,48 +126,38 @@ public class RxCacheHelper {
                 });
     }
 
-
     public static <T> Flowable<CacheResult<T>> loadCacheFlowable(final RxCache rxCache, final String key, Type type, final boolean needEmpty) {
-        return rxCache
+        Flowable<CacheResult<T>> flowable = rxCache
                 .<T>load2(key, type)
-                .onErrorResumeNext(new Function<Throwable, Publisher<? extends T>>() {
+                .flatMap(new Function<T, Publisher<CacheResult<T>>>() {
                     @Override
-                    public Publisher<? extends T> apply(@NonNull Throwable throwable) throws Exception {
-                        if (needEmpty) {
-                            return Flowable.empty();
-                        } else {
-                            return Flowable.error(throwable);
+                    public Publisher<CacheResult<T>> apply(@NonNull T t) throws Exception {
+                        if (t == null) {
+                            return Flowable.error(new NullPointerException("Not find the key corresponding to the cache"));
                         }
+                        return Flowable.just(new CacheResult<>(ResultFrom.Cache, key, t));
                     }
-                })
-                .map(new Function<T, CacheResult<T>>() {
-                    @Override
-                    public CacheResult<T> apply(@NonNull T o) throws Exception {
-                        LogUtils.debug("loadCache result=" + o);
-                        return new CacheResult<>(ResultFrom.Cache, key, o);
-                    }
-                });
+                } );
+        if (needEmpty) {
+            flowable = flowable
+                    .onErrorResumeNext(new Function<Throwable, Publisher<? extends CacheResult<T>>>() {
+                        @Override
+                        public Publisher<? extends CacheResult<T>> apply(@NonNull Throwable throwable) throws Exception {
+                            return Flowable.empty();
+                        }
+                    });
+        }
+        return flowable;
     }
 
     public static <T> Flowable<CacheResult<T>> loadRemoteFlowable(final RxCache rxCache, final String key, Flowable<T> source, final CacheTarget target, final boolean needEmpty) {
-        return source
-                .onErrorResumeNext(new Function<Throwable, Publisher<? extends T>>() {
-                    @Override
-                    public Publisher<? extends T> apply(@NonNull Throwable throwable) throws Exception {
-                        if (needEmpty) {
-                            return Flowable.empty();
-                        } else {
-                            return Flowable.error(throwable);
-                        }
-                    }
-                })
+        Flowable<CacheResult<T>> flowable = source
                 .map(new Function<T, CacheResult<T>>() {
                     @Override
                     public CacheResult<T> apply(@NonNull T t) throws Exception {
                         LogUtils.debug("loadRemote result=" + t);
                         rxCache.save(key, t, target)
                                 .subscribeOn(Schedulers.io())
-
                                 .subscribe(
                                         new Consumer<Boolean>() {
                                             @Override
@@ -187,14 +178,39 @@ public class RxCacheHelper {
                         return new CacheResult<>(ResultFrom.Remote, key, t);
                     }
                 });
+        if (needEmpty) {
+            flowable = flowable
+                    .onErrorResumeNext(new Function<Throwable, Publisher<? extends CacheResult<T>>>() {
+                        @Override
+                        public Publisher<? extends CacheResult<T>> apply(@NonNull Throwable throwable) throws Exception {
+                            return Flowable.empty();
+                        }
+                    });
+        }
+        return flowable;
     }
 
 
-    public static <T> Flowable<CacheResult<T>> loadRemoteSyncFlowable(final RxCache rxCache, final String key, Flowable<T> source, final CacheTarget target, final boolean needEmpty) {
-        return null;
+    public static <T> Flowable<CacheResult<T>> loadRemoteSyncFlowable(final RxCache rxCache, final String key, final Flowable<T> source, final CacheTarget target, final boolean needEmpty) {
+        Flowable<CacheResult<T>> flowable = source
+                .flatMap(new Function<T, Publisher<CacheResult<T>>>() {
+                    @Override
+                    public Publisher<CacheResult<T>> apply(@NonNull T t) throws Exception {
+                        return saveCacheSyncFlowable(rxCache, key, t, target);
+                    }
+                });
+        if (needEmpty) {
+            flowable = flowable.onErrorResumeNext(new Function<Throwable, Publisher<? extends CacheResult<T>>>() {
+                @Override
+                public Publisher<? extends CacheResult<T>> apply(@NonNull Throwable throwable) throws Exception {
+                    return Flowable.empty();
+                }
+            });
+        }
+        return flowable;
     }
 
-    public static <T> Flowable<CacheResult<T>> saveCacheSyncFlowable(RxCache rxCache, final String key, final T t, CacheTarget target){
+    public static <T> Flowable<CacheResult<T>> saveCacheSyncFlowable(RxCache rxCache, final String key, final T t, CacheTarget target) {
         return rxCache
                 .save2(key, t, target)
                 .map(new Function<Boolean, CacheResult<T>>() {
@@ -210,7 +226,6 @@ public class RxCacheHelper {
                     }
                 });
     }
-
 
 
 }

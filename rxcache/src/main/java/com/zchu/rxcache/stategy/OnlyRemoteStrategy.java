@@ -2,6 +2,7 @@ package com.zchu.rxcache.stategy;
 
 import com.zchu.rxcache.CacheTarget;
 import com.zchu.rxcache.RxCache;
+import com.zchu.rxcache.RxCacheHelper;
 import com.zchu.rxcache.data.CacheResult;
 
 import org.reactivestreams.Publisher;
@@ -38,6 +39,10 @@ class OnlyRemoteStrategy extends BaseStrategy {
 
     @Override
     public <T> Publisher<CacheResult<T>> flow(RxCache rxCache, String key, Flowable<T> source, Type type) {
-        return null;
+        if (isSync) {
+            return RxCacheHelper.loadRemoteSyncFlowable(rxCache, key, source, CacheTarget.MemoryAndDisk, false);
+        } else {
+            return RxCacheHelper.loadRemoteFlowable(rxCache, key, source, CacheTarget.MemoryAndDisk, false);
+        }
     }
 }

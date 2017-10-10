@@ -38,7 +38,12 @@ public final class NoneStrategy implements IStrategy {
     }
 
     @Override
-    public <T> Publisher<CacheResult<T>> flow(RxCache rxCache, String key, Flowable<T> source, Type type) {
-        return null;
+    public <T> Publisher<CacheResult<T>> flow(RxCache rxCache, final String key, Flowable<T> source, Type type) {
+        return source.map(new Function<T, CacheResult<T>>() {
+            @Override
+            public CacheResult<T> apply(@NonNull T t) throws Exception {
+                return new CacheResult<>(ResultFrom.Remote, key, t);
+            }
+        });
     }
 }

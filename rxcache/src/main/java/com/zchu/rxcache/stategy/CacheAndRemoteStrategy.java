@@ -2,6 +2,7 @@ package com.zchu.rxcache.stategy;
 
 import com.zchu.rxcache.CacheTarget;
 import com.zchu.rxcache.RxCache;
+import com.zchu.rxcache.RxCacheHelper;
 import com.zchu.rxcache.data.CacheResult;
 
 import org.reactivestreams.Publisher;
@@ -48,6 +49,19 @@ public final class CacheAndRemoteStrategy extends BaseStrategy {
 
     @Override
     public <T> Publisher<CacheResult<T>> flow(RxCache rxCache, String key, Flowable<T> source, Type type) {
-        return null;
+        Flowable<CacheResult<T>> cache = RxCacheHelper.loadCacheFlowable(rxCache, key, type,true);
+        Flowable<CacheResult<T>> remote;
+        if (isSync) {
+            remote = RxCacheHelper.loadRemoteSyncFlowable(rxCache, key, source, CacheTarget.MemoryAndDisk,false);
+        } else {
+            remote =RxCacheHelper.loadRemoteFlowable(rxCache, key, source, CacheTarget.MemoryAndDisk,false);
+        }
+        return Flowable.concat(cache, remote)
+                .filter(new Predicate<CacheResult<T>>() {
+                    @Override
+                    public boolean test(@NonNull CacheResult<T> result) throws Exception {
+                        return result != null && result.getData() != null;
+                    }
+                });
     }
 }
