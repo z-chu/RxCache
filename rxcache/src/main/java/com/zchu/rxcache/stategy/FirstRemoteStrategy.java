@@ -7,6 +7,7 @@ import com.zchu.rxcache.data.CacheResult;
 import org.reactivestreams.Publisher;
 
 import java.lang.reflect.Type;
+import java.util.Arrays;
 
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
@@ -28,14 +29,16 @@ public final class FirstRemoteStrategy extends BaseStrategy {
 
     @Override
     public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type) {
-        Observable<CacheResult<T>> cache = loadCache(rxCache, key, type, false);
+        Observable<CacheResult<T>> cache = loadCache(rxCache, key, type, true);
         Observable<CacheResult<T>> remote;
         if (isSync) {
-            remote = loadRemoteSync(rxCache, key, source, CacheTarget.MemoryAndDisk, true);
+            remote = loadRemoteSync(rxCache, key, source, CacheTarget.MemoryAndDisk, false);
         } else {
-            remote = loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk, true);
+            remote = loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk, false);
         }
-        return remote.switchIfEmpty(cache);
+        return Observable
+                .concatDelayError(Arrays.asList(cache,remote))
+                .take(1);
     }
 
     @Override

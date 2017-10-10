@@ -33,9 +33,9 @@ public final class CacheAndRemoteStrategy extends BaseStrategy {
         Observable<CacheResult<T>> cache = loadCache(rxCache, key, type,true);
         Observable<CacheResult<T>> remote;
         if (isSync) {
-            remote = loadRemoteSync(rxCache, key, source, CacheTarget.MemoryAndDisk,true);
+            remote = loadRemoteSync(rxCache, key, source, CacheTarget.MemoryAndDisk,false);
         } else {
-            remote = loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk,true);
+            remote = loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk,false);
         }
         return Observable.concat(cache, remote)
                 .filter(new Predicate<CacheResult<T>>() {
