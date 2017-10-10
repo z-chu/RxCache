@@ -99,12 +99,9 @@ class LruDiskCache {
         return false;
     }
 
-    void clear() {
-        try {
-            mDiskLruCache.delete();
-        } catch (IOException e) {
-            LogUtils.log(e);
-        }
+    void clear() throws IOException {
+        mDiskLruCache.delete();
+
     }
 
 

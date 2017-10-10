@@ -1,6 +1,7 @@
 package com.zchu.rxcache;
 
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 
 /**
@@ -95,7 +96,7 @@ class CacheCore {
     /**
      * 清空缓存
      */
-    void clear() {
+    void clear() throws IOException {
         if (memory != null) {
             memory.clear();
         }

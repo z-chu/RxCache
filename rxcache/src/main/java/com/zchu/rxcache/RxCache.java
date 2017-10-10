@@ -11,17 +11,20 @@ import com.zchu.rxcache.utils.LogUtils;
 import org.reactivestreams.Publisher;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.security.MessageDigest;
 
+import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
+import io.reactivex.FlowableEmitter;
+import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.FlowableTransformer;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.ObservableSource;
 import io.reactivex.ObservableTransformer;
-import io.reactivex.exceptions.Exceptions;
 
 
 /**
@@ -68,40 +71,56 @@ public final class RxCache {
             }
         };
     }
-    private static abstract class SimpleSubscribe<T> implements ObservableOnSubscribe<T> {
-        @Override
-        public void subscribe(ObservableEmitter<T> subscriber) throws Exception {
-            try {
-                T data = execute();
-                if (!subscriber.isDisposed()) {
-                    subscriber.onNext(data);
-                }
-            } catch (Throwable e) {
-                LogUtils.log(e);
-                Exceptions.throwIfFatal(e);
-                if (!subscriber.isDisposed()) {
-                    subscriber.onError(e);
-                }
-                return;
-            }
 
-            if (!subscriber.isDisposed()) {
-                subscriber.onComplete();
-            }
-        }
-
-        abstract T execute() throws Throwable;
-    }
 
     /**
      * 读取
      */
     public <T> Observable<T> load(final String key, final Type type) {
-        return Observable.create(new SimpleSubscribe<T>() {
+        return Observable.create(new ObservableOnSubscribe<T>() {
             @Override
-            T execute() {
-                LogUtils.debug("loadCache  key=" + key);
-                return cacheCore.load(getMD5MessageDigest(key), type);
+            public void subscribe(ObservableEmitter<T> observableEmitter) throws Exception {
+                T load = cacheCore.load(getMD5MessageDigest(key), type);
+                if (!observableEmitter.isDisposed()) {
+                    observableEmitter.onNext(load);
+                    observableEmitter.onComplete();
+                }
+            }
+        });
+    }
+
+    /**
+     * 读取
+     */
+    public <T> Flowable<T> load2(String key, Type type) {
+        return load2(key, type, BackpressureStrategy.BUFFER);
+    }
+
+    public <T> Flowable<T> load2(final String key, final Type type, BackpressureStrategy backpressureStrategy) {
+        return Flowable.create(new FlowableOnSubscribe<T>() {
+            @Override
+            public void subscribe(FlowableEmitter<T> flowableEmitter) throws Exception {
+                T load = cacheCore.load(getMD5MessageDigest(key), type);
+                if (!flowableEmitter.isCancelled()) {
+                    flowableEmitter.onNext(load);
+                    flowableEmitter.onComplete();
+                }
+            }
+        }, backpressureStrategy);
+    }
+
+    /**
+     * 保存
+     */
+    public <T> Observable<Boolean> save(final String key, final T value, final CacheTarget target) {
+        return Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(ObservableEmitter<Boolean> observableEmitter) throws Exception {
+                boolean save = cacheCore.save(getMD5MessageDigest(key), value, target);
+                if (!observableEmitter.isDisposed()) {
+                    observableEmitter.onNext(save);
+                    observableEmitter.onComplete();
+                }
             }
         });
     }
@@ -109,13 +128,24 @@ public final class RxCache {
     /**
      * 保存
      */
-    public <T> Observable<Boolean> save(final String key, final T value, final CacheTarget target) {
-        return Observable.create(new SimpleSubscribe<Boolean>() {
+    public <T> Flowable<Boolean> save2(final String key, final T value, final CacheTarget target) {
+        return save2(key, value, target, BackpressureStrategy.BUFFER);
+    }
+
+    /**
+     * 保存
+     */
+    public <T> Flowable<Boolean> save2(final String key, final T value, final CacheTarget target, BackpressureStrategy strategy) {
+        return Flowable.create(new FlowableOnSubscribe<Boolean>() {
             @Override
-            Boolean execute() throws Throwable {
-                return cacheCore.save(getMD5MessageDigest(key), value, target);
+            public void subscribe(FlowableEmitter<Boolean> flowableEmitter) throws Exception {
+                boolean save = cacheCore.save(getMD5MessageDigest(key), value, target);
+                if (!flowableEmitter.isCancelled()) {
+                    flowableEmitter.onNext(save);
+                    flowableEmitter.onComplete();
+                }
             }
-        });
+        }, strategy);
     }
 
     /**
@@ -139,14 +169,32 @@ public final class RxCache {
      * 清空缓存
      */
     public Observable<Boolean> clear() {
-        return Observable.create(new SimpleSubscribe<Boolean>() {
+        return Observable.create(new ObservableOnSubscribe<Boolean>() {
             @Override
-            Boolean execute() throws Throwable {
-                cacheCore.clear();
-                return true;
+            public void subscribe(ObservableEmitter<Boolean> observableEmitter) throws Exception {
+                try {
+                    cacheCore.clear();
+                    if (!observableEmitter.isDisposed()) {
+                        observableEmitter.onNext(true);
+                        observableEmitter.onComplete();
+                    }
+                } catch (IOException e) {
+                    LogUtils.log(e);
+                    if (!observableEmitter.isDisposed()) {
+                        observableEmitter.onError(e);
+                    }
+                }
             }
         });
     }
+
+    /**
+     * 清空缓存
+     */
+    public void clear2() throws IOException {
+        cacheCore.clear();
+    }
+
 
     /**
      * 构造器
