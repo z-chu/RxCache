@@ -8,8 +8,8 @@ android {
     defaultConfig {
         minSdkVersion 11
         targetSdkVersion 25
-        versionCode 5
-        versionName "2.0.5"
+        versionCode 6
+        versionName "2.1.0"
     }
     buildTypes {
         release {
@@ -36,7 +36,7 @@ publish {
     userOrg = 'zchu'
     groupId = 'com.zchu'
     artifactId = 'rxcache'
-    publishVersion = '2.0.5'
+    publishVersion = '2.1.0'
     desc = 'This is a cache library for android'
     website = 'https://github.com/z-chu/RxCache'
 }
