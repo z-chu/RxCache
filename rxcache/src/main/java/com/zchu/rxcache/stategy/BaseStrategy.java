@@ -18,9 +18,12 @@ import io.reactivex.schedulers.Schedulers;
 
 /**
  * 作者: 赵成柱 on 2016/9/12 0012.
+ * notice: Deprecated!
  */
+@Deprecated
 public abstract class BaseStrategy implements IStrategy {
 
+    @Deprecated
     protected <T> Observable<CacheResult<T>> loadCache(final RxCache rxCache, final String key, Type type, final boolean needEmpty) {
         Observable<CacheResult<T>> observable = rxCache
                 .<T>load(key, type)
@@ -45,6 +48,7 @@ public abstract class BaseStrategy implements IStrategy {
         return observable;
     }
 
+    @Deprecated
     protected <T> Observable<CacheResult<T>> loadRemote(final RxCache rxCache, final String key, Observable<T> source, final CacheTarget target, final boolean needEmpty) {
         Observable<CacheResult<T>> observable = source
                 .map(new Function<T, CacheResult<T>>() {
@@ -85,7 +89,7 @@ public abstract class BaseStrategy implements IStrategy {
         return observable;
     }
 
-
+    @Deprecated
     protected <T> Observable<CacheResult<T>> loadRemoteSync(final RxCache rxCache, final String key, Observable<T> source, final CacheTarget target, final boolean needEmpty) {
         Observable<CacheResult<T>> observable = source
                 .flatMap(new Function<T, ObservableSource<CacheResult<T>>>() {
@@ -106,6 +110,7 @@ public abstract class BaseStrategy implements IStrategy {
 
     }
 
+    @Deprecated
     protected <T> Observable<CacheResult<T>> saveCacheSync(RxCache rxCache, final String key, final T t, CacheTarget target) {
         return rxCache.save(key, t, target)
                 .map(new Function<Boolean, CacheResult<T>>() {

@@ -18,7 +18,7 @@ import io.reactivex.functions.Predicate;
  * 先缓存，后网络
  * 作者: 赵成柱 on 2016/9/12 0012.
  */
-public final class CacheAndRemoteStrategy extends BaseStrategy {
+public final class CacheAndRemoteStrategy implements IStrategy {
     private boolean isSync;
 
     public CacheAndRemoteStrategy() {
@@ -31,12 +31,12 @@ public final class CacheAndRemoteStrategy extends BaseStrategy {
 
     @Override
     public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type) {
-        Observable<CacheResult<T>> cache = loadCache(rxCache, key, type,true);
+        Observable<CacheResult<T>> cache = RxCacheHelper.loadCache(rxCache, key, type, true);
         Observable<CacheResult<T>> remote;
         if (isSync) {
-            remote = loadRemoteSync(rxCache, key, source, CacheTarget.MemoryAndDisk,false);
+            remote = RxCacheHelper.loadRemoteSync(rxCache, key, source, CacheTarget.MemoryAndDisk, false);
         } else {
-            remote = loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk,false);
+            remote = RxCacheHelper.loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk, false);
         }
         return Observable.concat(cache, remote)
                 .filter(new Predicate<CacheResult<T>>() {
@@ -49,12 +49,12 @@ public final class CacheAndRemoteStrategy extends BaseStrategy {
 
     @Override
     public <T> Publisher<CacheResult<T>> flow(RxCache rxCache, String key, Flowable<T> source, Type type) {
-        Flowable<CacheResult<T>> cache = RxCacheHelper.loadCacheFlowable(rxCache, key, type,true);
+        Flowable<CacheResult<T>> cache = RxCacheHelper.loadCacheFlowable(rxCache, key, type, true);
         Flowable<CacheResult<T>> remote;
         if (isSync) {
-            remote = RxCacheHelper.loadRemoteSyncFlowable(rxCache, key, source, CacheTarget.MemoryAndDisk,false);
+            remote = RxCacheHelper.loadRemoteSyncFlowable(rxCache, key, source, CacheTarget.MemoryAndDisk, false);
         } else {
-            remote =RxCacheHelper.loadRemoteFlowable(rxCache, key, source, CacheTarget.MemoryAndDisk,false);
+            remote = RxCacheHelper.loadRemoteFlowable(rxCache, key, source, CacheTarget.MemoryAndDisk, false);
         }
         return Flowable.concat(cache, remote)
                 .filter(new Predicate<CacheResult<T>>() {

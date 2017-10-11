@@ -17,7 +17,7 @@ import io.reactivex.Observable;
  * 优先网络
  * 作者: 赵成柱 on 2016/9/12 0012.
  */
-public final class FirstRemoteStrategy extends BaseStrategy {
+public final class FirstRemoteStrategy implements IStrategy {
     private boolean isSync;
 
     public FirstRemoteStrategy() {
@@ -30,15 +30,15 @@ public final class FirstRemoteStrategy extends BaseStrategy {
 
     @Override
     public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type) {
-        Observable<CacheResult<T>> cache = loadCache(rxCache, key, type, true);
+        Observable<CacheResult<T>> cache = RxCacheHelper.loadCache(rxCache, key, type, true);
         Observable<CacheResult<T>> remote;
         if (isSync) {
-            remote = loadRemoteSync(rxCache, key, source, CacheTarget.MemoryAndDisk, false);
+            remote =  RxCacheHelper.loadRemoteSync(rxCache, key, source, CacheTarget.MemoryAndDisk, false);
         } else {
-            remote = loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk, false);
+            remote =  RxCacheHelper.loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk, false);
         }
         return Observable
-                .concatDelayError(Arrays.asList(cache,remote))
+                .concatDelayError(Arrays.asList(remote,cache))
                 .take(1);
     }
 
@@ -49,11 +49,10 @@ public final class FirstRemoteStrategy extends BaseStrategy {
         if (isSync) {
             remote =  RxCacheHelper.loadRemoteSyncFlowable(rxCache, key, source, CacheTarget.MemoryAndDisk, false);
         } else {
-
             remote =RxCacheHelper.loadRemoteFlowable(rxCache, key, source, CacheTarget.MemoryAndDisk, false);
         }
         return Flowable
-                .concatDelayError(Arrays.asList(cache,remote))
+                .concatDelayError(Arrays.asList(remote,cache))
                 .take(1);
     }
 

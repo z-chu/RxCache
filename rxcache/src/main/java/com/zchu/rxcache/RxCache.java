@@ -5,7 +5,8 @@ import android.os.StatFs;
 import com.zchu.rxcache.data.CacheResult;
 import com.zchu.rxcache.diskconverter.IDiskConverter;
 import com.zchu.rxcache.diskconverter.SerializableDiskConverter;
-import com.zchu.rxcache.stategy.IStrategy;
+import com.zchu.rxcache.stategy.IFlowableStrategy;
+import com.zchu.rxcache.stategy.IObservableStrategy;
 import com.zchu.rxcache.utils.LogUtils;
 
 import org.reactivestreams.Publisher;
@@ -49,12 +50,16 @@ public final class RxCache {
 
     }
 
+    /**
+     *
+     * notice: Deprecated! Use {@link #transformObservable(String, Type, IObservableStrategy)} ()}  replace.
+     */
     @Deprecated
-    public <T> ObservableTransformer<T, CacheResult<T>> transformer(String key, Type type, IStrategy strategy) {
+    public <T> ObservableTransformer<T, CacheResult<T>> transformer(String key, Type type, IObservableStrategy strategy) {
         return transformObservable(key, type, strategy);
     }
 
-    public <T> ObservableTransformer<T, CacheResult<T>> transformObservable(final String key, final Type type, final IStrategy strategy) {
+    public <T> ObservableTransformer<T, CacheResult<T>> transformObservable(final String key, final Type type, final IObservableStrategy strategy) {
         return new ObservableTransformer<T, CacheResult<T>>() {
             @Override
             public ObservableSource<CacheResult<T>> apply(Observable<T> tObservable) {
@@ -63,7 +68,7 @@ public final class RxCache {
         };
     }
 
-    public <T> FlowableTransformer<T, CacheResult<T>> transformFlowable(final String key, final Type type, final IStrategy strategy) {
+    public <T> FlowableTransformer<T, CacheResult<T>> transformFlowable(final String key, final Type type, final IFlowableStrategy strategy) {
         return new FlowableTransformer<T, CacheResult<T>>() {
             @Override
             public Publisher<CacheResult<T>> apply(Flowable<T> flowable) {
@@ -92,11 +97,11 @@ public final class RxCache {
     /**
      * 读取
      */
-    public <T> Flowable<T> load2(String key, Type type) {
-        return load2(key, type, BackpressureStrategy.BUFFER);
+    public <T> Flowable<T> load2Flowable(String key, Type type) {
+        return load2Flowable(key, type, BackpressureStrategy.LATEST);
     }
 
-    public <T> Flowable<T> load2(final String key, final Type type, BackpressureStrategy backpressureStrategy) {
+    public <T> Flowable<T> load2Flowable(final String key, final Type type, BackpressureStrategy backpressureStrategy) {
         return Flowable.create(new FlowableOnSubscribe<T>() {
             @Override
             public void subscribe(FlowableEmitter<T> flowableEmitter) throws Exception {
@@ -128,14 +133,14 @@ public final class RxCache {
     /**
      * 保存
      */
-    public <T> Flowable<Boolean> save2(final String key, final T value, final CacheTarget target) {
-        return save2(key, value, target, BackpressureStrategy.BUFFER);
+    public <T> Flowable<Boolean> save2Flowable(final String key, final T value, final CacheTarget target) {
+        return save2Flowable(key, value, target, BackpressureStrategy.LATEST);
     }
 
     /**
      * 保存
      */
-    public <T> Flowable<Boolean> save2(final String key, final T value, final CacheTarget target, BackpressureStrategy strategy) {
+    public <T> Flowable<Boolean> save2Flowable(final String key, final T value, final CacheTarget target, BackpressureStrategy strategy) {
         return Flowable.create(new FlowableOnSubscribe<Boolean>() {
             @Override
             public void subscribe(FlowableEmitter<Boolean> flowableEmitter) throws Exception {

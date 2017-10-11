@@ -8,8 +8,6 @@ import com.zchu.rxcache.utils.LogUtils;
 import com.zchu.rxcache.utils.MemorySizeOf;
 import com.zchu.rxcache.utils.Occupy;
 
-import java.io.IOException;
-import java.io.Serializable;
 import java.util.HashMap;
 
 /**
@@ -78,14 +76,7 @@ class LruMemoryCache {
         if (value instanceof Bitmap) {
             LogUtils.debug("Bitmap");
             size = MemorySizeOf.sizeOf((Bitmap) value);
-        } else if (value instanceof Serializable) {
-            LogUtils.debug("Serializable");
-            try {
-                size = MemorySizeOf.sizeOf((Serializable) value);
-            } catch (IOException e) {
-                size = occupy.occupyof(value);
-            }
-        } else {
+        }else {
             size = occupy.occupyof(value);
         }
         LogUtils.debug("size=" + size + " value=" + value);

@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         return gankBean.getResults();
                     }
                 })
-                .compose(rxCache.<List<GankBean.ResultsBean>>transformer("custom_key", new TypeToken<List<GankBean.ResultsBean>>() {
+                .compose(rxCache.<List<GankBean.ResultsBean>>transformObservable("custom_key", new TypeToken<List<GankBean.ResultsBean>>() {
                 }.getType(), strategy))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

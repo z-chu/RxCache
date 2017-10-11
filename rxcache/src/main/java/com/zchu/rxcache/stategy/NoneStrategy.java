@@ -19,7 +19,7 @@ import io.reactivex.functions.Function;
  * 仅加载网络，不缓存
  */
 
-public final class NoneStrategy implements IStrategy {
+public final class NoneStrategy implements IStrategy  {
 
     private NoneStrategy() {
     }
@@ -28,7 +28,6 @@ public final class NoneStrategy implements IStrategy {
 
     @Override
     public <T> Observable<CacheResult<T>> execute(RxCache rxCache, final String key, Observable<T> source, Type type) {
-
         return source.map(new Function<T, CacheResult<T>>() {
             @Override
             public CacheResult<T> apply(@NonNull T t) throws Exception {

@@ -128,7 +128,7 @@ public class RxCacheHelper {
 
     public static <T> Flowable<CacheResult<T>> loadCacheFlowable(final RxCache rxCache, final String key, Type type, final boolean needEmpty) {
         Flowable<CacheResult<T>> flowable = rxCache
-                .<T>load2(key, type)
+                .<T>load2Flowable(key, type)
                 .flatMap(new Function<T, Publisher<CacheResult<T>>>() {
                     @Override
                     public Publisher<CacheResult<T>> apply(@NonNull T t) throws Exception {
@@ -212,7 +212,7 @@ public class RxCacheHelper {
 
     public static <T> Flowable<CacheResult<T>> saveCacheSyncFlowable(RxCache rxCache, final String key, final T t, CacheTarget target) {
         return rxCache
-                .save2(key, t, target)
+                .save2Flowable(key, t, target)
                 .map(new Function<Boolean, CacheResult<T>>() {
                     @Override
                     public CacheResult<T> apply(@NonNull Boolean aBoolean) throws Exception {
