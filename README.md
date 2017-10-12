@@ -25,7 +25,7 @@
 * **RxJava 2.0**
 ```groovy
 dependencies {
-	compile 'com.zchu:rxcache:2.0.5'
+	compile 'com.zchu:rxcache:2.1.0'
 }
 ```
 * **RxJava 1.0**
