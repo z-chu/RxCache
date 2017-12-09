@@ -48,7 +48,15 @@ class CacheCore {
      */
     <T> boolean save(String key, T value, CacheTarget target) {
         if (value == null) { //如果要保存的值为空,则删除
-            return memory.remove(key) && disk.remove(key);
+            boolean memoryRemove = true;
+            if (memory != null) {
+                memoryRemove = memory.remove(key);
+            }
+            boolean diskRemove = true;
+            if (disk != null) {
+                diskRemove = disk.remove(key);
+            }
+            return memoryRemove && diskRemove;
         }
         boolean save = false;
         if (target.supportMemory() && memory != null) {
