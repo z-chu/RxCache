@@ -1,6 +1,9 @@
 # RxCache
 
-[ ![Download](https://api.bintray.com/packages/zchu/maven/rxcache/images/download.svg) ](https://bintray.com/zchu/maven/rxcache/_latestVersion)
+[ ![Download](https://api.bintray.com/packages/zchu/maven/rxcache/images/download.svg) ](https://bintray.com/zchu/maven/rxcache/_latestVersion)<a href="http://www.methodscount.com/?lib=com.zchu%3Arxcache%3A1.2.6"><img src="https://img.shields.io/badge/Size-42 KB-e91e63.svg"/></a>
+
+
+
 
 简单一步，缓存搞定。这是一个专用于RxJava，解决Android中网络请求的缓存处理框架。
 
@@ -25,7 +28,7 @@
 * **RxJava 2.0**
 ```groovy
 dependencies {
-	compile 'com.zchu:rxcache:2.0.5'
+	compile 'com.zchu:rxcache:2.1.0'
 }
 ```
 * **RxJava 1.0**
