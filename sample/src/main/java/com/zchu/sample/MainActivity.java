@@ -1,6 +1,7 @@
 package com.zchu.sample;
 
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -14,6 +15,7 @@ import com.zchu.rxcache.data.CacheResult;
 import com.zchu.rxcache.data.ResultFrom;
 import com.zchu.rxcache.diskconverter.GsonDiskConverter;
 import com.zchu.rxcache.stategy.CacheStrategy;
+import com.zchu.rxcache.stategy.FirstCacheTimeoutStrategy;
 import com.zchu.rxcache.stategy.IStrategy;
 
 import java.io.File;
@@ -45,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bindOnClickLister(
                 R.id.btn_first_remote,
                 R.id.btn_first_cache,
+                R.id.btn_first_cache_timeout,
                 R.id.btn_only_remote,
                 R.id.btn_only_cache,
                 R.id.btn_cache_and_remote,
@@ -58,11 +61,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .build()
                 .create(GankApi.class);
         rxCache = new RxCache.Builder()
-                .appVersion(1)
+                .appVersion(2)
                 .diskDir(new File(getCacheDir().getPath() + File.separator + "data-cache"))
                 .diskConverter(new GsonDiskConverter())
                 .diskMax(20 * 1024 * 1024)
-                .memoryMax(2 * 1024 * 1024)
+                .memoryMax(0)
                 .setDebug(true)
                 .build();
         Logger.init("RxCache");
@@ -85,6 +88,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.btn_first_cache:
                 loadData(CacheStrategy.firstCache());
+                break;
+            case R.id.btn_first_cache_timeout:
+                loadData(CacheStrategy.firstCacheTimeout(5000));
                 break;
             case R.id.btn_only_remote:
                 loadData(CacheStrategy.onlyRemote());
@@ -128,10 +134,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onNext(CacheResult<List<GankBean.ResultsBean>> listCacheResult) {
                         Logger.e(listCacheResult.getData());
-                        if (listCacheResult.getFrom() == ResultFrom.Cache) {
-                            tvData.setText("来自缓存：\n" + listCacheResult.toString());
+                        if (ResultFrom.ifFromCache(listCacheResult.getFrom())) {
+                            tvData.setText("来自缓存： 写入时间" + listCacheResult.getTimestamp() + "\n " + listCacheResult.getData());
                         } else {
-                            tvData.setText("来自网络：\n" + listCacheResult.toString());
+                            tvData.setText("来自网络：\n " + listCacheResult.getData());
                         }
                     }
 

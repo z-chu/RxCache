@@ -1,8 +1,12 @@
 package com.zchu.rxcache;
 
 
+import com.zchu.rxcache.data.CacheResult;
+import com.zchu.rxcache.data.ResultFrom;
+
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.security.Key;
 
 /**
  * 缓存核心
@@ -22,24 +26,19 @@ class CacheCore {
     /**
      * 读取
      */
-    <T> T load(String key, Type type) {
+    <T> CacheResult<T> load(String key, Type type) {
         if (memory != null) {
-            T result = memory.load(key, 0);
+            CacheHolder<T> result = memory.load(key);
             if (result != null) {
-                return result;
+                return new CacheResult<>(ResultFrom.Memory, key, result.data, result.timestamp);
             }
         }
-
         if (disk != null) {
-            T result = disk.load(key, 0, type);
+            CacheHolder<T> result = disk.load(key, type);
             if (result != null) {
-                if (memory != null) {
-                    memory.save(key, result);
-                }
-                return result;
+                return new CacheResult<>(ResultFrom.Disk, key, result.data, result.timestamp);
             }
         }
-
         return null;
     }
 
@@ -65,38 +64,26 @@ class CacheCore {
         if (target.supportDisk() && disk != null) {
             return disk.save(key, value);
         }
-
         return save;
     }
 
     /**
      * 是否包含
-     *
-     * @param key
-     * @return
      */
     boolean containsKey(String key) {
-        if (memory != null && memory.containsKey(key)) {
-            return true;
-        }
-        if (disk != null && disk.containsKey(key)) {
-            return true;
-        }
-        return false;
+        return memory != null && memory.containsKey(key) || disk != null && disk.containsKey(key);
     }
 
     /**
      * 删除缓存
-     *
-     * @param key
      */
     boolean remove(String key) {
-        boolean isRemove = false;
+        boolean isRemove = true;
         if (memory != null) {
             isRemove = memory.remove(key);
         }
         if (disk != null) {
-            return disk.remove(key);
+            isRemove = isRemove && disk.remove(key);
         }
         return isRemove;
     }

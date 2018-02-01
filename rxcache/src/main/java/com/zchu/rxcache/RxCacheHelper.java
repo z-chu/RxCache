@@ -1,5 +1,7 @@
 package com.zchu.rxcache;
 
+import android.annotation.SuppressLint;
+
 import com.zchu.rxcache.data.CacheResult;
 import com.zchu.rxcache.data.ResultFrom;
 import com.zchu.rxcache.utils.LogUtils;
@@ -27,16 +29,7 @@ public class RxCacheHelper {
 
     public static <T> Observable<CacheResult<T>> loadCache(final RxCache rxCache, final String key, Type type, final boolean needEmpty) {
         Observable<CacheResult<T>> observable = rxCache
-                .<T>load(key, type)
-                .flatMap(new Function<T, ObservableSource<CacheResult<T>>>() {
-                    @Override
-                    public ObservableSource<CacheResult<T>> apply(@NonNull T t) throws Exception {
-                        if (t == null) {
-                            return Observable.error(new NullPointerException("Not find the key corresponding to the cache"));
-                        }
-                        return Observable.just(new CacheResult<>(ResultFrom.Cache, key, t));
-                    }
-                });
+                .<T>load(key, type);
         if (needEmpty) {
             observable = observable
                     .onErrorResumeNext(new Function<Throwable, ObservableSource<? extends CacheResult<T>>>() {
@@ -52,6 +45,7 @@ public class RxCacheHelper {
     public static <T> Observable<CacheResult<T>> loadRemote(final RxCache rxCache, final String key, Observable<T> source, final CacheTarget target, final boolean needEmpty) {
         Observable<CacheResult<T>> observable = source
                 .map(new Function<T, CacheResult<T>>() {
+                    @SuppressLint("CheckResult")
                     @Override
                     public CacheResult<T> apply(@NonNull T t) throws Exception {
                         LogUtils.debug("loadRemote result=" + t);
@@ -127,17 +121,7 @@ public class RxCacheHelper {
     }
 
     public static <T> Flowable<CacheResult<T>> loadCacheFlowable(final RxCache rxCache, final String key, Type type, final boolean needEmpty) {
-        Flowable<CacheResult<T>> flowable = rxCache
-                .<T>load2Flowable(key, type)
-                .flatMap(new Function<T, Publisher<CacheResult<T>>>() {
-                    @Override
-                    public Publisher<CacheResult<T>> apply(@NonNull T t) throws Exception {
-                        if (t == null) {
-                            return Flowable.error(new NullPointerException("Not find the key corresponding to the cache"));
-                        }
-                        return Flowable.just(new CacheResult<>(ResultFrom.Cache, key, t));
-                    }
-                } );
+        Flowable<CacheResult<T>> flowable = rxCache.load2Flowable(key, type);
         if (needEmpty) {
             flowable = flowable
                     .onErrorResumeNext(new Function<Throwable, Publisher<? extends CacheResult<T>>>() {
@@ -153,6 +137,7 @@ public class RxCacheHelper {
     public static <T> Flowable<CacheResult<T>> loadRemoteFlowable(final RxCache rxCache, final String key, Flowable<T> source, final CacheTarget target, final boolean needEmpty) {
         Flowable<CacheResult<T>> flowable = source
                 .map(new Function<T, CacheResult<T>>() {
+                    @SuppressLint("CheckResult")
                     @Override
                     public CacheResult<T> apply(@NonNull T t) throws Exception {
                         LogUtils.debug("loadRemote result=" + t);

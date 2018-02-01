@@ -21,29 +21,29 @@ class LruDiskCache {
     LruDiskCache(IDiskConverter diskConverter, File diskDir, int appVersion, long diskMaxSize) {
         this.mDiskConverter = diskConverter;
         try {
-            mDiskLruCache = DiskLruCache.open(diskDir, appVersion, 1, diskMaxSize);
+            mDiskLruCache = DiskLruCache.open(diskDir, appVersion, 2, diskMaxSize);
         } catch (IOException e) {
             LogUtils.log(e);
         }
     }
 
-    <T> T load(String key, long existTime, Type type) {
+    <T> CacheHolder<T> load(String key, Type type) {
         if (mDiskLruCache == null) {
             return null;
         }
         try {
-            DiskLruCache.Editor edit = mDiskLruCache.edit(key);
-            if (edit == null) {
-                return null;
+            DiskLruCache.Snapshot snapshot = mDiskLruCache.get(key);
+            if (snapshot != null) {
+                InputStream source = snapshot.getInputStream(0);
+                T value = mDiskConverter.load(source, type);
+                long timestamp = 0;
+                String string = snapshot.getString(1);
+                if (string != null) {
+                    timestamp = Long.parseLong(string);
+                }
+                snapshot.close();
+                return new CacheHolder<>(value,timestamp);
             }
-            InputStream source = edit.newInputStream(0);
-            T value;
-            if (source != null) {
-                value = mDiskConverter.load(source, type);
-                edit.commit();
-                return value;
-            }
-            edit.abort();
         } catch (IOException e) {
             LogUtils.log(e);
         }
@@ -59,20 +59,24 @@ class LruDiskCache {
         if (value == null) {
             return remove(key);
         }
+        DiskLruCache.Editor edit = null;
         try {
-            DiskLruCache.Editor edit = mDiskLruCache.edit(key);
-            if (edit == null) {
-                return false;
-            }
+            edit = mDiskLruCache.edit(key);
             OutputStream sink = edit.newOutputStream(0);
-            if (sink != null) {
-                mDiskConverter.writer(sink, value);
-                edit.commit();
-                return true;
-            }
-            edit.abort();
+            mDiskConverter.writer(sink, value);
+            long l = System.currentTimeMillis();
+            edit.set(1, String.valueOf(l));
+            edit.commit();
+            return true;
         } catch (IOException e) {
             LogUtils.log(e);
+            if (edit != null) {
+                try {
+                    edit.abort();
+                } catch (IOException e1) {
+                    LogUtils.log(e1);
+                }
+            }
         }
         return false;
     }

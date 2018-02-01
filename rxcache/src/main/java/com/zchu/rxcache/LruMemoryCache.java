@@ -4,10 +4,12 @@ package com.zchu.rxcache;
 import android.graphics.Bitmap;
 import android.support.v4.util.LruCache;
 
+import com.zchu.rxcache.data.CacheResult;
 import com.zchu.rxcache.utils.LogUtils;
 import com.zchu.rxcache.utils.MemorySizeOf;
 import com.zchu.rxcache.utils.Occupy;
 
+import java.security.Key;
 import java.util.HashMap;
 
 /**
@@ -16,10 +18,12 @@ import java.util.HashMap;
 class LruMemoryCache {
     private LruCache<String, Object> mCache;
     private HashMap<String, Integer> memorySizeMap;//储存初次加入缓存的size，规避对象在内存中大小变化造成的测量出错
+    private HashMap<String, Long> timestampMap;
     private Occupy occupy;
 
     public LruMemoryCache(final int cacheSize) {
         memorySizeMap = new HashMap<>();
+        timestampMap = new HashMap<>();
         byte to = 0;
         byte t4 = 4;
         occupy = new Occupy(to, to, t4);
@@ -31,14 +35,19 @@ class LruMemoryCache {
         };
     }
 
-    public <T> T load(String key, long existTime) {
-        return (T) mCache.get(key);
+    public <T> CacheHolder<T> load(String key) {
+        T value= (T) mCache.get(key);
+        if(value!=null){
+            return new CacheHolder<>(value,timestampMap.get(key));
+        }
+        return null;
     }
 
     public <T> boolean save(String key, T value) {
         if (null != value) {
             memorySizeMap.put(key, (int) countSize(value));
             mCache.put(key, value);
+            timestampMap.put(key, System.currentTimeMillis());
         }
         return true;
     }
@@ -56,6 +65,7 @@ class LruMemoryCache {
         Object remove = mCache.remove(key);
         if (remove != null) {
             memorySizeMap.remove(key);
+            timestampMap.remove(key);
             return true;
         }
         return false;
@@ -76,7 +86,7 @@ class LruMemoryCache {
         if (value instanceof Bitmap) {
             LogUtils.debug("Bitmap");
             size = MemorySizeOf.sizeOf((Bitmap) value);
-        }else {
+        } else {
             size = occupy.occupyof(value);
         }
         LogUtils.debug("size=" + size + " value=" + value);

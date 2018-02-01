@@ -6,105 +6,86 @@ package com.zchu.rxcache.stategy;
 
 public final class CacheStrategy {
 
-    private static FirstRemoteStrategy sFirstRemoteStrategy;
-    private static FirstRemoteStrategy sFirstRemoteSyncStrategy;
-    private static FirstCacheStrategy sFirstCacheStrategy;
-    private static FirstCacheStrategy sFirstCacheSyncStrategy;
-    private static OnlyRemoteStrategy sOnlyRemoteStrategy;
-    private static OnlyRemoteStrategy sOnlyRemoteSyncStrategy;
-    private static OnlyCacheStrategy sOnlyCacheStrategy;
-    private static CacheAndRemoteStrategy sCacheAndRemoteStrategy;
-    private static CacheAndRemoteStrategy sCacheAndRemoteSyncStrategy;
+
 
 
     /**
      * 优先网络,缓存用异步的方式保存
      */
     public static IStrategy firstRemote() {
-        if (sFirstRemoteStrategy == null) {
-            sFirstRemoteStrategy = new FirstRemoteStrategy();
-        }
-        return sFirstRemoteStrategy;
+
+        return new FirstRemoteStrategy();
     }
 
     /**
      * 优先网络,缓存用同步的方式保存
      */
     public static IStrategy firstRemoteSync() {
-        if (sFirstRemoteSyncStrategy == null) {
-            sFirstRemoteSyncStrategy = new FirstRemoteStrategy(true);
-        }
-        return sFirstRemoteSyncStrategy;
+        return  new FirstRemoteStrategy(true);
     }
 
     /**
      * 优先缓存,缓存用异步的方式保存
      */
     public static IStrategy firstCache() {
-        if (sFirstCacheStrategy == null) {
-            sFirstCacheStrategy = new FirstCacheStrategy();
-        }
-        return sFirstCacheStrategy;
+        return  new FirstCacheStrategy();
     }
 
     /**
      * 优先缓存,缓存用同步的方式保存
      */
     public static IStrategy firstCacheSync() {
-        if (sFirstCacheSyncStrategy == null) {
-            sFirstCacheSyncStrategy = new FirstCacheStrategy(true);
-        }
-        return sFirstCacheSyncStrategy;
+        return  new FirstCacheStrategy(true);
     }
+
+    /**
+     * 优先缓存,并设置超时时间
+     */
+    public static IStrategy firstCacheTimeout(long milliSecond) {
+        return  new FirstCacheTimeoutStrategy(milliSecond);
+    }
+
+    /**
+     * 优先缓存,并设置超时时间
+     */
+    public static IStrategy firstCacheTimeoutSync(long milliSecond) {
+        return  new FirstCacheTimeoutStrategy(milliSecond,true);
+    }
+
 
     /**
      * 仅加载网络，但数据依然会被缓存
      */
     public static IStrategy onlyRemote() {
-        if (sOnlyRemoteStrategy == null) {
-            sOnlyRemoteStrategy = new OnlyRemoteStrategy();
-        }
-        return sOnlyRemoteStrategy;
+        return new OnlyRemoteStrategy();
     }
 
     /**
      * 仅加载网络，但数据依然会被缓存
      */
     public static IStrategy onlyRemoteSync() {
-        if (sOnlyRemoteSyncStrategy == null) {
-            sOnlyRemoteSyncStrategy = new OnlyRemoteStrategy(true);
-        }
-        return sOnlyRemoteSyncStrategy;
+        return  new OnlyRemoteStrategy(true);
     }
 
     /**
      * 仅加载缓存
      */
     public static IStrategy onlyCache() {
-        if (sOnlyCacheStrategy == null) {
-            sOnlyCacheStrategy = new OnlyCacheStrategy();
-        }
-        return sOnlyCacheStrategy;
+        return new OnlyCacheStrategy();
     }
 
     /**
      * 先加载缓存，后加载网络，缓存用异步的方式保存
      */
     public static IStrategy cacheAndRemote() {
-        if (sCacheAndRemoteStrategy == null) {
-            sCacheAndRemoteStrategy = new CacheAndRemoteStrategy();
-        }
-        return sCacheAndRemoteStrategy;
+        return new CacheAndRemoteStrategy();
     }
 
     /**
      * 先加载缓存，后加载网络，缓存用同步的方式保存
      */
     public static IStrategy cacheAndRemoteSync() {
-        if (sCacheAndRemoteSyncStrategy == null) {
-            sCacheAndRemoteSyncStrategy = new CacheAndRemoteStrategy(true);
-        }
-        return sCacheAndRemoteSyncStrategy;
+        return new CacheAndRemoteStrategy(true);
     }
 
     /**

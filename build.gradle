@@ -3,9 +3,13 @@
 buildscript {
     repositories {
         jcenter()
+        maven {
+            url 'https://maven.google.com/'
+            name 'Google'
+        }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.0'
+        classpath 'com.android.tools.build:gradle:3.0.1'
 
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
         classpath 'com.novoda:bintray-release:0.5.0'
@@ -22,6 +26,10 @@ allprojects {
         mavenCentral()
         maven { url "https://jitpack.io" }
         maven{url 'https://dl.bintray.com/zchu/maven/'}
+        maven {
+            url 'https://maven.google.com/'
+            name 'Google'
+        }
     }
 
     tasks.withType(Javadoc) {

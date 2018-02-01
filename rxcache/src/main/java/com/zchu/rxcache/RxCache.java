@@ -81,14 +81,18 @@ public final class RxCache {
     /**
      * 读取
      */
-    public <T> Observable<T> load(final String key, final Type type) {
-        return Observable.create(new ObservableOnSubscribe<T>() {
+    public <T> Observable< CacheResult<T>> load(final String key, final Type type) {
+        return Observable.create(new ObservableOnSubscribe< CacheResult<T>>() {
             @Override
-            public void subscribe(ObservableEmitter<T> observableEmitter) throws Exception {
-                T load = cacheCore.load(getMD5MessageDigest(key), type);
+            public void subscribe(ObservableEmitter< CacheResult<T>> observableEmitter) throws Exception {
+                CacheResult<T> load = cacheCore.load(getMD5MessageDigest(key), type);
                 if (!observableEmitter.isDisposed()) {
-                    observableEmitter.onNext(load);
-                    observableEmitter.onComplete();
+                    if(load!=null) {
+                        observableEmitter.onNext(load);
+                        observableEmitter.onComplete();
+                    }else{
+                        observableEmitter.onError(new NullPointerException("Not find the key corresponding to the cache"));
+                    }
                 }
             }
         });
@@ -97,18 +101,22 @@ public final class RxCache {
     /**
      * 读取
      */
-    public <T> Flowable<T> load2Flowable(String key, Type type) {
+    public <T> Flowable< CacheResult<T>> load2Flowable(String key, Type type) {
         return load2Flowable(key, type, BackpressureStrategy.LATEST);
     }
 
-    public <T> Flowable<T> load2Flowable(final String key, final Type type, BackpressureStrategy backpressureStrategy) {
-        return Flowable.create(new FlowableOnSubscribe<T>() {
+    public <T> Flowable< CacheResult<T>> load2Flowable(final String key, final Type type, BackpressureStrategy backpressureStrategy) {
+        return Flowable.create(new FlowableOnSubscribe< CacheResult<T>>() {
             @Override
-            public void subscribe(FlowableEmitter<T> flowableEmitter) throws Exception {
-                T load = cacheCore.load(getMD5MessageDigest(key), type);
+            public void subscribe(FlowableEmitter< CacheResult<T>> flowableEmitter) throws Exception {
+                CacheResult<T> load = cacheCore.load(getMD5MessageDigest(key), type);
                 if (!flowableEmitter.isCancelled()) {
-                    flowableEmitter.onNext(load);
-                    flowableEmitter.onComplete();
+                    if(load!=null) {
+                        flowableEmitter.onNext(load);
+                        flowableEmitter.onComplete();
+                    }else{
+                        flowableEmitter.onError(new NullPointerException("Not find the key corresponding to the cache"));
+                    }
                 }
             }
         }, backpressureStrategy);
