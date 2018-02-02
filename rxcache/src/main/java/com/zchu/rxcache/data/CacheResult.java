@@ -1,5 +1,7 @@
 package com.zchu.rxcache.data;
 
+import io.reactivex.functions.Function;
+
 /**
  * 数据
  */
@@ -66,5 +68,22 @@ public class CacheResult<T> {
                 ", data=" + data +
                 ", timestamp=" + timestamp +
                 '}';
+    }
+
+
+    /**
+     * 用于map操作符，只想拿CacheResult.data的数据
+     *
+     * @param <T> Subscriber真正需要的数据类型，也就是Data部分的数据类型
+     */
+    public static class MapFunc<T> implements Function<CacheResult<T>, T> {
+
+        @Override
+        public T apply(CacheResult<T> tCacheResult) throws Exception {
+            if (tCacheResult != null) {
+                return tCacheResult.getData();
+            }
+            return null;
+        }
     }
 }
