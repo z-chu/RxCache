@@ -63,7 +63,7 @@ public final class RxCache {
         return new ObservableTransformer<T, CacheResult<T>>() {
             @Override
             public ObservableSource<CacheResult<T>> apply(Observable<T> tObservable) {
-                return strategy.execute(RxCache.this, getMD5MessageDigest(key), tObservable, type);
+                return strategy.execute(RxCache.this, key, tObservable, type);
             }
         };
     }
@@ -72,7 +72,7 @@ public final class RxCache {
         return new FlowableTransformer<T, CacheResult<T>>() {
             @Override
             public Publisher<CacheResult<T>> apply(Flowable<T> flowable) {
-                return strategy.flow(RxCache.this, getMD5MessageDigest(key), flowable, type);
+                return strategy.flow(RxCache.this, key, flowable, type);
             }
         };
     }

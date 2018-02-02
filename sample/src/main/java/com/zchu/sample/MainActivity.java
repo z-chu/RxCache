@@ -6,6 +6,7 @@ import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.reflect.TypeToken;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -19,6 +20,7 @@ import com.zchu.rxcache.stategy.FirstCacheTimeoutStrategy;
 import com.zchu.rxcache.stategy.IStrategy;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import io.reactivex.Observer;
@@ -33,7 +35,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = "MainActivity";
-    private GankApi gankApi;
+    private ServerAPI serverAPI;
     private RxCache rxCache;
     private TextView tvData;
     private Disposable mSubscription;
@@ -43,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        tvData = (TextView) findViewById(R.id.tv_data);
+        tvData = findViewById(R.id.tv_data);
         bindOnClickLister(
                 R.id.btn_first_remote,
                 R.id.btn_first_cache,
@@ -51,21 +53,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 R.id.btn_only_remote,
                 R.id.btn_only_cache,
                 R.id.btn_cache_and_remote,
-                R.id.btn_none
+                R.id.btn_none,
+                R.id.btn_clean_cache
         );
-        gankApi = new Retrofit.Builder()
-                .baseUrl(GankApi.BASE_URL)
+        serverAPI = new Retrofit.Builder()
+                .baseUrl(ServerAPI.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .client(new OkHttpClient.Builder().build())
                 .build()
-                .create(GankApi.class);
+                .create(ServerAPI.class);
         rxCache = new RxCache.Builder()
                 .appVersion(2)
                 .diskDir(new File(getCacheDir().getPath() + File.separator + "data-cache"))
                 .diskConverter(new GsonDiskConverter())
                 .diskMax(20 * 1024 * 1024)
-                .memoryMax(0)
                 .setDebug(true)
                 .build();
         Logger.init("RxCache");
@@ -104,6 +106,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_none:
                 loadData(CacheStrategy.none());
                 break;
+
+            case R.id.btn_clean_cache:
+                rxCache.clear().subscribe();
+                tvData.setText("数据");
+                break;
         }
 
 
@@ -114,26 +121,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mSubscription.dispose();
         }
         tvData.setText("加载中...");
-        gankApi.getHistoryGank(1)
-                .map(new Function<GankBean, List<GankBean.ResultsBean>>() {
+        serverAPI.getInTheatersMovies()
+                .map(new Function<Movie, List<Movie.SubjectsBean>>() {
                     @Override
-                    public List<GankBean.ResultsBean> apply(@NonNull GankBean gankBean) throws Exception {
-                        return gankBean.getResults();
+                    public List<Movie.SubjectsBean> apply(Movie movie) throws Exception {
+                        return movie.subjects;
                     }
                 })
-                .compose(rxCache.<List<GankBean.ResultsBean>>transformObservable("custom_key", new TypeToken<List<GankBean.ResultsBean>>() {
-                }.getType(), strategy))
+                //泛型这样使用
+                .compose(rxCache.< List<Movie.SubjectsBean>>transformObservable("custom_key", new TypeToken< List<Movie.SubjectsBean>>() {}.getType(), strategy))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<CacheResult<List<GankBean.ResultsBean>>>() {
+                .subscribe(new Observer<CacheResult<List<Movie.SubjectsBean>>>() {
                     @Override
-                    public void onSubscribe(Disposable d) {
-                        mSubscription = d;
+                    public void onSubscribe(Disposable disposable) {
+                        mSubscription = disposable;
                     }
 
                     @Override
-                    public void onNext(CacheResult<List<GankBean.ResultsBean>> listCacheResult) {
-                        Logger.e(listCacheResult.getData());
+                    public void onNext(CacheResult<List<Movie.SubjectsBean>> listCacheResult) {
+                        Logger.e(listCacheResult);
                         if (ResultFrom.ifFromCache(listCacheResult.getFrom())) {
                             tvData.setText("来自缓存： 写入时间" + listCacheResult.getTimestamp() + "\n " + listCacheResult.getData());
                         } else {
@@ -142,15 +149,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
 
                     @Override
-                    public void onError(Throwable e) {
-                        tvData.setText(e.getMessage());
+                    public void onError(Throwable throwable) {
+                        tvData.setText(throwable.getMessage());
                     }
 
                     @Override
                     public void onComplete() {
 
                     }
-
                 });
     }
 }

@@ -1,6 +1,7 @@
 package com.zchu.rxcache;
 
 import com.jakewharton.disklrucache.DiskLruCache;
+import com.jakewharton.disklrucache.Util;
 import com.zchu.rxcache.diskconverter.IDiskConverter;
 import com.zchu.rxcache.utils.LogUtils;
 
@@ -42,7 +43,7 @@ class LruDiskCache {
                     timestamp = Long.parseLong(string);
                 }
                 snapshot.close();
-                return new CacheHolder<>(value,timestamp);
+                return new CacheHolder<>(value, timestamp);
             }
         } catch (IOException e) {
             LogUtils.log(e);
@@ -104,8 +105,22 @@ class LruDiskCache {
     }
 
     void clear() throws IOException {
-        mDiskLruCache.delete();
+        deleteContents(mDiskLruCache.getDirectory());
+    }
 
+    private static void deleteContents(File dir) throws IOException {
+        File[] files = dir.listFiles();
+        if (files == null) {
+            throw new IOException("not a readable directory: " + dir);
+        }
+        for (File file : files) {
+            if (file.isDirectory()) {
+                deleteContents(file);
+            }
+            if (!file.delete()) {
+                throw new IOException("failed to delete file: " + file);
+            }
+        }
     }
 
 

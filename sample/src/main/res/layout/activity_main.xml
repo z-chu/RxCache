@@ -57,15 +57,27 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="仅网络" />
+
+        <Button
+            android:id="@+id/btn_clean_cache"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="清除缓存" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/tv_data"
+    <ScrollView
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:text="数据" />
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/tv_data"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="数据" />
+    </ScrollView>
 
 
 </LinearLayout>
