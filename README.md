@@ -69,7 +69,7 @@ observable
 
 ```java
 public class CacheResult<T> {
-    private ResultFrom from;//数据来原，原始observable、内存或硬盘
+    private ResultFrom from;//数据来源，原始observable、内存或硬盘
     private String key;
     private T data; // 数据
     private long timestamp; //数据写入到缓存时的时间戳，如果来自原始observable则为0
