@@ -133,31 +133,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 break;
             case R.id.btn_none:
-                // loadData(CacheStrategy.none());
-                /*rxCache
-                        .<String>load("test_key1", String.class)
-                        .subscribe(new Consumer<CacheResult<String>>() {
-                            @Override
-                            public void accept(CacheResult<String> objectCacheResult) throws Exception {
-
-                            }
-                        });*/
-                rxCache.save("test_key1", "阿斯顿", CacheTarget.MemoryAndDisk).subscribe();
+                loadData(CacheStrategy.none());
                 break;
 
             case R.id.btn_clean_cache:
-                //  rxCache.clear().subscribe();
-                //  rxCache.save("", "阿斯顿", CacheTarget.MemoryAndDisk);
-                //    tvData.setText("数据");
-                rxCache
-                        .<String>load("test_key1", String.class)
-                        .map(new CacheResult.MapFunc<String>())
-                        .subscribe(new Consumer<String>() {
-                            @Override
-                            public void accept(String s) throws Exception {
-                                Toast.makeText(MainActivity.this, s, Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                rxCache.clear().subscribe();
+                tvData.setText("数据");
                 break;
         }
 
