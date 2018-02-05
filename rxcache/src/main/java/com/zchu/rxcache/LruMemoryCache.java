@@ -30,15 +30,19 @@ class LruMemoryCache {
         mCache = new LruCache<String, Object>(cacheSize) {
             @Override
             protected int sizeOf(String key, Object value) {
-                return memorySizeMap.get(key);
+                Integer integer = memorySizeMap.get(key);
+                if (integer == null) {
+                    return 0;
+                }
+                return integer;
             }
         };
     }
 
     public <T> CacheHolder<T> load(String key) {
-        T value= (T) mCache.get(key);
-        if(value!=null){
-            return new CacheHolder<>(value,timestampMap.get(key));
+        T value = (T) mCache.get(key);
+        if (value != null) {
+            return new CacheHolder<>(value, timestampMap.get(key));
         }
         return null;
     }
@@ -72,8 +76,8 @@ class LruMemoryCache {
     }
 
     public void clear() {
-        memorySizeMap.clear();
         mCache.evictAll();
+        memorySizeMap.clear();
     }
 
     private long countSize(Object value) {

@@ -21,7 +21,10 @@ import com.zchu.rxcache.stategy.IStrategy;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -129,7 +132,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 })
                 //泛型这样使用
-                .compose(rxCache.< List<Movie.SubjectsBean>>transformObservable("custom_key", new TypeToken< List<Movie.SubjectsBean>>() {}.getType(), strategy))
+                .compose(rxCache.<List<Movie.SubjectsBean>>transformObservable("custom_key", new TypeToken<List<Movie.SubjectsBean>>() {
+                }.getType(), strategy))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<CacheResult<List<Movie.SubjectsBean>>>() {
@@ -142,7 +146,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void onNext(CacheResult<List<Movie.SubjectsBean>> listCacheResult) {
                         Logger.e(listCacheResult);
                         if (ResultFrom.ifFromCache(listCacheResult.getFrom())) {
-                            tvData.setText("来自缓存： 写入时间" + listCacheResult.getTimestamp() + "\n " + listCacheResult.getData());
+                            String format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                                    .format(new Date(listCacheResult.getTimestamp()));
+                            tvData.setText("来自缓存  写入时间：" + format + "\n " + listCacheResult.getData());
                         } else {
                             tvData.setText("来自网络：\n " + listCacheResult.getData());
                         }
