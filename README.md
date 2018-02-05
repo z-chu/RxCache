@@ -105,6 +105,7 @@ serverAPI.getInTheatersMovies()
             //泛型这样使用
             .compose(rxCache.<List<Movie.SubjectsBean>>transformObservable("getInTheatersMovies", new TypeToken<List<Movie.SubjectsBean>>() {
             }.getType(), strategy))
+	    .map(new CacheResult.MapFunc<List<Movie.SubjectsBean>>())
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(...);
