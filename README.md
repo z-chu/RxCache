@@ -9,6 +9,8 @@
 
 <img src="/screenshots/s0.gif"  /><img src="/screenshots/s1.gif"  />
 
+[下载APK](https://raw.githubusercontent.com/z-chu/RxCache/master/sample-debug.apk)
+
 ## 特性
 ### 缓存层级
 
@@ -80,6 +82,7 @@ public class CacheResult<T> {
 ## retrofit使用
 
 在如果你使用的是 [retrofit](https://github.com/square/retrofit) 那可原有代码的基础上，仅需2行代码搞定，**一步到位！！！**
+
 Observable 调用
 ```java
 //注意在 <~> 中声明数据源的类型
