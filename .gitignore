@@ -1,6 +1,5 @@
 # Built application files
-*.apk
-*.ap_
+
 
 # Files for the ART/Dalvik VM
 *.dex
@@ -41,8 +40,7 @@ captures/
 *.jks
 ### Android template
 # Built application files
-*.apk
-*.ap_
+
 
 # Files for the ART/Dalvik VM
 *.dex
