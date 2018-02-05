@@ -14,17 +14,24 @@ import io.reactivex.Observable;
 import io.reactivex.functions.Predicate;
 
 /**
- * 优先缓存
+ * 优先缓存并可设置超时时间
  * 作者: 赵成柱 on 2016/9/12 0012.
  */
 public final class FirstCacheTimeoutStrategy implements IStrategy {
     private boolean isSync;
     private long milliSecond;
 
+    /**
+     * @param milliSecond 毫秒数
+     */
     public FirstCacheTimeoutStrategy(long milliSecond) {
         this(milliSecond, false);
     }
 
+    /**
+     * @param milliSecond 毫秒数
+     * @param isSync 是否用同步的方式保存缓存
+     */
     public FirstCacheTimeoutStrategy(long milliSecond, boolean isSync) {
         this.isSync = isSync;
         this.milliSecond = milliSecond;

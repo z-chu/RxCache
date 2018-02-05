@@ -39,14 +39,16 @@ public final class CacheStrategy {
     }
 
     /**
-     * 优先缓存,并设置超时时间
+     *  优先缓存,并设置超时时间
+     * @param milliSecond 毫秒
      */
     public static IStrategy firstCacheTimeout(long milliSecond) {
         return  new FirstCacheTimeoutStrategy(milliSecond);
     }
 
     /**
-     * 优先缓存,并设置超时时间
+     *  优先缓存,并设置超时时间,缓存用同步的方式保存
+     * @param milliSecond 毫秒
      */
     public static IStrategy firstCacheTimeoutSync(long milliSecond) {
         return  new FirstCacheTimeoutStrategy(milliSecond,true);
