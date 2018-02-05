@@ -68,6 +68,7 @@ class LruDiskCache {
             long l = System.currentTimeMillis();
             edit.set(1, String.valueOf(l));
             edit.commit();
+            LogUtils.log("save:  value="+value+" , status="+true);
             return true;
         } catch (IOException e) {
             LogUtils.log(e);
@@ -78,6 +79,7 @@ class LruDiskCache {
                     LogUtils.log(e1);
                 }
             }
+            LogUtils.log("save:  value="+value+" , status="+false);
         }
         return false;
     }

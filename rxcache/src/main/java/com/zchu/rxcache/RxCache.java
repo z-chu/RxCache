@@ -269,8 +269,8 @@ public final class RxCache {
             if (this.diskDir == null) {
                 throw new NullPointerException("DiskDir can not be null.");
             }
-            if (!this.diskDir.exists()) {
-                this.diskDir.mkdirs();
+            if (!diskDir.exists() && !diskDir.mkdirs()) {
+                throw new RuntimeException("can't make dirs in " + diskDir.getAbsolutePath());
             }
             if (this.diskConverter == null) {
                 this.diskConverter = new SerializableDiskConverter();

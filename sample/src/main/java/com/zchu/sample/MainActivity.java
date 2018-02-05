@@ -5,16 +5,19 @@ import android.os.Environment;
 import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.reflect.TypeToken;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import com.zchu.log.Logger;
+import com.zchu.rxcache.CacheTarget;
 import com.zchu.rxcache.RxCache;
 import com.zchu.rxcache.data.CacheResult;
 import com.zchu.rxcache.data.ResultFrom;
 import com.zchu.rxcache.diskconverter.GsonDiskConverter;
+import com.zchu.rxcache.diskconverter.SerializableDiskConverter;
 import com.zchu.rxcache.stategy.CacheStrategy;
 import com.zchu.rxcache.stategy.FirstCacheTimeoutStrategy;
 import com.zchu.rxcache.stategy.IStrategy;
@@ -30,6 +33,7 @@ import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
@@ -42,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private RxCache rxCache;
     private TextView tvData;
     private Disposable mSubscription;
+    private Switch swIsAsync;
 
 
     @Override
@@ -49,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         tvData = findViewById(R.id.tv_data);
+        swIsAsync = findViewById(R.id.sw_is_async);
         bindOnClickLister(
                 R.id.btn_first_remote,
                 R.id.btn_first_cache,
@@ -89,30 +95,69 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_first_remote:
-                loadData(CacheStrategy.firstRemote());
+                if (swIsAsync.isChecked()) {
+                    loadData(CacheStrategy.firstRemote());
+                } else {
+                    loadData(CacheStrategy.firstRemoteSync());
+                }
                 break;
             case R.id.btn_first_cache:
-                loadData(CacheStrategy.firstCache());
+                if (swIsAsync.isChecked()) {
+                    loadData(CacheStrategy.firstCache());
+                } else {
+                    loadData(CacheStrategy.firstCacheSync());
+                }
                 break;
             case R.id.btn_first_cache_timeout:
-                loadData(CacheStrategy.firstCacheTimeout(5000));
+                if (swIsAsync.isChecked()) {
+                    loadData(CacheStrategy.firstCacheTimeout(5000));
+                } else {
+                    loadData(CacheStrategy.firstCacheTimeoutSync(5000));
+                }
                 break;
             case R.id.btn_only_remote:
-                loadData(CacheStrategy.onlyRemote());
+                if (swIsAsync.isChecked()) {
+                    loadData(CacheStrategy.onlyRemote());
+                } else {
+                    loadData(CacheStrategy.onlyRemoteSync());
+                }
                 break;
             case R.id.btn_only_cache:
                 loadData(CacheStrategy.onlyCache());
                 break;
             case R.id.btn_cache_and_remote:
-                loadData(CacheStrategy.cacheAndRemote());
+                if (swIsAsync.isChecked()) {
+                    loadData(CacheStrategy.cacheAndRemote());
+                } else {
+                    loadData(CacheStrategy.cacheAndRemoteSync());
+                }
                 break;
             case R.id.btn_none:
-                loadData(CacheStrategy.none());
+                // loadData(CacheStrategy.none());
+                /*rxCache
+                        .<String>load("test_key1", String.class)
+                        .subscribe(new Consumer<CacheResult<String>>() {
+                            @Override
+                            public void accept(CacheResult<String> objectCacheResult) throws Exception {
+
+                            }
+                        });*/
+                rxCache.save("test_key1", "阿斯顿", CacheTarget.MemoryAndDisk).subscribe();
                 break;
 
             case R.id.btn_clean_cache:
-                rxCache.clear().subscribe();
-                tvData.setText("数据");
+                //  rxCache.clear().subscribe();
+                //  rxCache.save("", "阿斯顿", CacheTarget.MemoryAndDisk);
+                //    tvData.setText("数据");
+                rxCache
+                        .<String>load("test_key1", String.class)
+                        .map(new CacheResult.MapFunc<String>())
+                        .subscribe(new Consumer<String>() {
+                            @Override
+                            public void accept(String s) throws Exception {
+                                Toast.makeText(MainActivity.this, s, Toast.LENGTH_SHORT).show();
+                            }
+                        });
                 break;
         }
 
@@ -124,6 +169,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mSubscription.dispose();
         }
         tvData.setText("加载中...");
+        final long startTime = System.currentTimeMillis();
         serverAPI.getInTheatersMovies()
                 .map(new Function<Movie, List<Movie.SubjectsBean>>() {
                     @Override
@@ -132,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 })
                 //泛型这样使用
-                .compose(rxCache.<List<Movie.SubjectsBean>>transformObservable("custom_key", new TypeToken<List<Movie.SubjectsBean>>() {
+                .compose(rxCache.<List<Movie.SubjectsBean>>transformObservable("getInTheatersMovies", new TypeToken<List<Movie.SubjectsBean>>() {
                 }.getType(), strategy))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -150,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     .format(new Date(listCacheResult.getTimestamp()));
                             tvData.setText("来自缓存  写入时间：" + format + "\n " + listCacheResult.getData());
                         } else {
-                            tvData.setText("来自网络：\n " + listCacheResult.getData());
+                            tvData.setText("来自网络：\n " + listCacheResult.getData() + "\n 响应时间：" + (System.currentTimeMillis() - startTime) + "毫秒");
                         }
                     }
 
