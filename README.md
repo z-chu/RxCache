@@ -7,8 +7,7 @@
 
 简单一步，缓存搞定。这是一个专用于 RxJava，解决 Android 中对任何 Observable 发出的结果做缓存处理的框架。
 
-<img src="/screenshots/s0.gif" alt="screenshot" title="screenshot" width="270" height="486" />
-<img src="/screenshots/s1.gif" alt="screenshot" title="screenshot" width="270" height="486" />
+<img src="/screenshots/s0.gif"  /><img src="/screenshots/s1.gif"  />
 
 ## 特性
 ### 缓存层级
@@ -46,7 +45,7 @@ dependencies {
 rxCache = new RxCache.Builder()
                 .appVersion(1)//当版本号改变,缓存路径下存储的所有数据都会被清除掉
                 .diskDir(new File(getCacheDir().getPath() + File.separator + "data-cache"))
-                .diskConverter(new SerializableDiskConverter())//支持Serializable、Json(GsonDiskConverter)
+                .diskConverter(new GsonDiskConverter())//支持Serializable、Json(GsonDiskConverter)
                 .memoryMax(2*1024*1024)
                 .diskMax(20*1024*1024)
                 .build();
@@ -110,7 +109,8 @@ Flowable 也是支持的
                 .subscribe(...);
 
 ```
-如何你纠结 Key 值的取名，建议使用方法名+参数名：+加参数值
+如何你纠结 Key 值的取名，建议使用 **("方法名"+"参数名："+"加参数值")**
+
 ## 泛型
 因为泛型擦除的原因，遇到 List<~> 这样的泛型时可以使用：
 
@@ -132,6 +132,7 @@ Flowable 也是支持的
  ------------------------- | ------- 
  firstRemote()             | 优先网络
  firstCache() |优先缓存
+ firstCacheTimeout(milliSecond) |优先缓存,并设置超时时间
  onlyRemote() | 仅加载网络，但数据依然会被缓存
  onlyCache()           | 仅加载缓存 
  cacheAndRemote()              | 先加载缓存，后加载网络   
@@ -143,7 +144,7 @@ Flowable 也是支持的
 如： `CacheStrategy.firstRemoteSync()`
 使用同步保存方式，数据会在缓存写入完以后才响应。
 
-## 用法
+## 其他用法
 
 ### 保存缓存：
 ```java
@@ -161,7 +162,7 @@ public enum CacheTarget {
 如 保存字符串到内存和硬盘：
 ```java
 rxCache
-	.save("test_key1","阿斯顿", CacheTarget.MemoryAndDisk)
+	.save("test_key1","RxCache is simple", CacheTarget.MemoryAndDisk)
 	.subscribeOn(Schedulers.io())
 	.subscribe();
 ```
@@ -186,5 +187,5 @@ rxCache
 
 
 ## 混淆配置
-本 library 不需求添加额外混淆配置，所以代码都可被混淆
+本 Library 不需求添加额外混淆配置，所以代码都可被混淆
 
