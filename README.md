@@ -57,9 +57,10 @@ observable
 	.subscribe(new Observer<CacheResult<~>>() {
 		...
 		@Override
-        public void onNext(CacheResult<~> cacheResult) {
-          Object data=cacheResult.getData();//获取你的数据
-        }
+		public void onNext(CacheResult<~> cacheResult) {
+			Object data=cacheResult.getData();//获取你的数据
+		}
+		...
 	}
 	
 ```
@@ -94,19 +95,19 @@ Flowable 也是支持的
 
 调用示例：
 ```java
-   serverAPI.getInTheatersMovies()
-                .map(new Function<Movie, List<Movie.SubjectsBean>>() {
-                    @Override
-                    public List<Movie.SubjectsBean> apply(Movie movie) throws Exception {
-                        return movie.subjects;
-                    }
-                })
-                //泛型这样使用
-                .compose(rxCache.<List<Movie.SubjectsBean>>transformObservable("getInTheatersMovies", new TypeToken<List<Movie.SubjectsBean>>() {
-                }.getType(), strategy))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(...);
+serverAPI.getInTheatersMovies()
+            .map(new Function<Movie, List<Movie.SubjectsBean>>() {
+                @Override
+                public List<Movie.SubjectsBean> apply(Movie movie) throws Exception {
+                    return movie.subjects;
+                }
+            })
+            //泛型这样使用
+            .compose(rxCache.<List<Movie.SubjectsBean>>transformObservable("getInTheatersMovies", new TypeToken<List<Movie.SubjectsBean>>() {
+            }.getType(), strategy))
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(...);
 
 ```
 如何你纠结 Key 值的取名，建议使用 **("方法名"+"参数名："+"加参数值")**
