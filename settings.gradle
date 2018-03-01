@@ -1,1 +1,1 @@
-include ':sample', ':rxcache'
+include ':sample', ':rxcache', ':rxcache-kotlin'
