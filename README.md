@@ -69,7 +69,7 @@ observable
 	
 ```
 
-**推荐使用kotlin** ，规避了泛型擦除，可不传 `type` :
+**推荐使用 kotlin** ，规避了泛型擦除，可不传 `type` :
 ```kotlin
 observable
 	.compose<CacheResult<List<Movie.SubjectsBean>>>(rxCache!!.transformObservable("getInTheatersMovies", strategy))
@@ -147,7 +147,7 @@ serverAPI.getInTheatersMovies()
 .compose(rxCache.<Bean>transformer("custom_key",Bean.class, strategy))
 ```
 
-**如果你使用Kotlin则无需传入`Type`**
+**如果你使用 Kotlin 则无需传入 `Type`**
 ```kotlin
 .compose<List<~>>(rxCache!!.transformObservable("custom_key", strategy))
 ```
