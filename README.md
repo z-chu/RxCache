@@ -72,12 +72,11 @@ observable
 **推荐使用 kotlin** ，规避了泛型擦除，可不传 `type` :
 ```kotlin
 observable
-	.compose<CacheResult<List<Movie.SubjectsBean>>>(rxCache!!.transformObservable("getInTheatersMovies", strategy))
-	.subscribe(new Observer<CacheResult<~>>() {
+	.compose<CacheResult<~>>(rxCache!!.transformObservable("custom_key", strategy))
+	.subscribe(object : Observer<CacheResult<~>>  {
 		...
-		@Override
-		public void onNext(CacheResult<~> cacheResult) {
-			Object data=cacheResult.getData();//获取你的数据
+		  override fun onNext(listCacheResult: CacheResult<~>) {
+			val data = listCacheResult.data//获取你的数据
 		}
 		...
 	}
