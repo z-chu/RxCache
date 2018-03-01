@@ -13,6 +13,7 @@ import com.zchu.rxcache.RxCache
 import com.zchu.rxcache.data.CacheResult
 import com.zchu.rxcache.data.ResultFrom
 import com.zchu.rxcache.diskconverter.GsonDiskConverter
+import com.zchu.rxcache.kotlin.transformObservable
 import com.zchu.rxcache.stategy.CacheStrategy
 import com.zchu.rxcache.stategy.IStrategy
 import io.reactivex.Observer
@@ -122,7 +123,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         serverAPI!!.inTheatersMovies
                 .map { it.subjects!! }
                 //泛型这样使用
-                .compose<CacheResult<List<Movie.SubjectsBean>>>(rxCache!!.transformObservable("getInTheatersMovies",object : TypeToken<List<Movie.SubjectsBean>>(){}.type, strategy))
+                .compose<CacheResult<List<Movie.SubjectsBean>>>(rxCache!!.transformObservable("getInTheatersMovies", strategy))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<CacheResult<List<Movie.SubjectsBean>>> {

@@ -47,6 +47,10 @@ dependencies {
 
 
     compile 'com.zchu:rxcache:2.3.0'
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     compile 'com.zchu:rxcache-kotlin:2.3.0'
 
+}
+repositories {
+    mavenCentral()
 }

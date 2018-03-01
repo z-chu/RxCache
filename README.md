@@ -32,11 +32,13 @@
 
 ## 引入
 
-* **RxJava 2.0**
+**RxJava 2.0**
 ```groovy
-dependencies {
-	compile 'com.zchu:rxcache:2.2.0'
-}
+compile 'com.zchu:rxcache:2.3.0'
+```
+可添加kotlin扩展解决泛型擦除问题
+```groovy
+compile 'com.zchu:rxcache-kotlin:2.3.0'
 ```
 
 ## 如何使用
@@ -56,6 +58,21 @@ rxCache = new RxCache.Builder()
 ```java
 observable
 	.compose(rxCache.<~>>transformObservable("custom_key", type, strategy))
+	.subscribe(new Observer<CacheResult<~>>() {
+		...
+		@Override
+		public void onNext(CacheResult<~> cacheResult) {
+			Object data=cacheResult.getData();//获取你的数据
+		}
+		...
+	}
+	
+```
+
+**推荐使用kotlin** ，规避了泛型擦除，可不传 `type` :
+```kotlin
+observable
+	.compose<CacheResult<List<Movie.SubjectsBean>>>(rxCache!!.transformObservable("getInTheatersMovies", strategy))
 	.subscribe(new Observer<CacheResult<~>>() {
 		...
 		@Override
@@ -128,6 +145,11 @@ serverAPI.getInTheatersMovies()
 ```java
 // <~> 为List元素的数据类型
 .compose(rxCache.<Bean>transformer("custom_key",Bean.class, strategy))
+```
+
+**如果你使用Kotlin则无需传入`Type`**
+```kotlin
+.compose<List<~>>(rxCache!!.transformObservable("custom_key", strategy))
 ```
 
 ## 策略选择
