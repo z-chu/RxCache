@@ -36,7 +36,7 @@
 ```groovy
 compile 'com.zchu:rxcache:2.3.0'
 ```
-可添加kotlin扩展解决泛型擦除问题
+**可添加 Kotlin 扩展,解决泛型擦除问题**
 ```groovy
 compile 'com.zchu:rxcache-kotlin:2.3.0'
 ```
@@ -69,7 +69,7 @@ observable
 	
 ```
 
-**推荐使用 kotlin** ，规避了泛型擦除，可不传 `type` :
+**推荐使用 Kotlin** ，规避了泛型擦除，可不传 `type` :
 ```kotlin
 observable
 	.compose<CacheResult<~>>(rxCache!!.transformObservable("custom_key", strategy))
@@ -140,7 +140,7 @@ serverAPI.getInTheatersMovies()
 .compose(rxCache.<List<~>>transformer("custom_key", new TypeToken<List<~>>() {}.getType(), strategy))
 ```
 
-没有泛型时Type直接传Class即可
+没有泛型时 Type 直接传 Class 即可
 ```java
 // <~> 为List元素的数据类型
 .compose(rxCache.<Bean>transformer("custom_key",Bean.class, strategy))
