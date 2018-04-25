@@ -142,7 +142,6 @@ serverAPI.getInTheatersMovies()
 
 没有泛型时 Type 直接传 Class 即可
 ```java
-// <~> 为List元素的数据类型
 .compose(rxCache.<Bean>transformer("custom_key",Bean.class, strategy))
 ```
 
