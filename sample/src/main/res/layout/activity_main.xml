@@ -59,6 +59,17 @@
             android:text="仅网络" />
 
         <Button
+            android:id="@+id/btn_load_cache"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="load缓存" />
+
+        <Button
+            android:id="@+id/btn_save_cache"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="save缓存" />
+        <Button
             android:id="@+id/btn_clean_cache"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

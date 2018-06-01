@@ -28,4 +28,24 @@ inline fun <reified T> RxCache.transformFlowable(key: String, strategy: IFlowabl
 }
 
 
+inline fun <reified T> Observable<T>.rxCache(key: String, strategy: IObservableStrategy): Observable<CacheResult<T>> {
+    return this.rxCache(RxCache.getDefault(), key, strategy)
+}
+
+inline fun <reified T> Observable<T>.rxCache(rxCache: RxCache, key: String, strategy: IObservableStrategy): Observable<CacheResult<T>> {
+    return this.compose<CacheResult<T>>(rxCache.transformObservable(key, object : TypeToken<T>() {}.type, strategy))
+}
+
+inline fun <reified T> Flowable<T>.rxCache(key: String, strategy: IFlowableStrategy): Flowable<CacheResult<T>> {
+    return this.rxCache(RxCache.getDefault(), key, strategy)
+}
+
+inline fun <reified T> Flowable<T>.rxCache(rxCache: RxCache, key: String, strategy: IFlowableStrategy): Flowable<CacheResult<T>> {
+    return this.compose<CacheResult<T>>(rxCache.transformFlowable(key, object : TypeToken<T>() {}.type, strategy))
+}
+
+
+
+
+
 

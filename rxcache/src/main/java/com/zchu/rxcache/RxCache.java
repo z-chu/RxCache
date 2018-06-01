@@ -1,6 +1,8 @@
 package com.zchu.rxcache;
 
+import android.os.Environment;
 import android.os.StatFs;
+import android.support.annotation.NonNull;
 
 import com.zchu.rxcache.data.CacheResult;
 import com.zchu.rxcache.diskconverter.IDiskConverter;
@@ -37,6 +39,31 @@ public final class RxCache {
 
     private final CacheCore cacheCore;
 
+    private static RxCache sDefaultRxCache;
+
+    @NonNull
+    public static RxCache getDefault() {
+        if (sDefaultRxCache == null) {
+            sDefaultRxCache = new RxCache.Builder()
+                    .appVersion(1)
+                    .diskDir(Environment.getDownloadCacheDirectory())
+                    .diskConverter(new SerializableDiskConverter())
+                    .setDebug(true)
+                    .build();
+
+        }
+        return sDefaultRxCache;
+    }
+
+    public static void initializeDefault(RxCache rxCache) {
+        if (sDefaultRxCache == null) {
+            RxCache.sDefaultRxCache = rxCache;
+        } else {
+            LogUtils.log("You need to initialize it before using the default rxCache and only initialize it once");
+        }
+    }
+
+
     private RxCache(Builder builder) {
         LruMemoryCache memoryCache = null;
         if (builder.memoryMaxSize > 0) {
@@ -51,7 +78,6 @@ public final class RxCache {
     }
 
     /**
-     *
      * notice: Deprecated! Use {@link #transformObservable(String, Type, IObservableStrategy)} ()}  replace.
      */
     @Deprecated
@@ -81,16 +107,16 @@ public final class RxCache {
     /**
      * 读取
      */
-    public <T> Observable< CacheResult<T>> load(final String key, final Type type) {
-        return Observable.create(new ObservableOnSubscribe< CacheResult<T>>() {
+    public <T> Observable<CacheResult<T>> load(final String key, final Type type) {
+        return Observable.create(new ObservableOnSubscribe<CacheResult<T>>() {
             @Override
-            public void subscribe(ObservableEmitter< CacheResult<T>> observableEmitter) throws Exception {
+            public void subscribe(ObservableEmitter<CacheResult<T>> observableEmitter) throws Exception {
                 CacheResult<T> load = cacheCore.load(getMD5MessageDigest(key), type);
                 if (!observableEmitter.isDisposed()) {
-                    if(load!=null) {
+                    if (load != null) {
                         observableEmitter.onNext(load);
                         observableEmitter.onComplete();
-                    }else{
+                    } else {
                         observableEmitter.onError(new NullPointerException("Not find the key corresponding to the cache"));
                     }
                 }
@@ -101,25 +127,30 @@ public final class RxCache {
     /**
      * 读取
      */
-    public <T> Flowable< CacheResult<T>> load2Flowable(String key, Type type) {
+    public <T> Flowable<CacheResult<T>> load2Flowable(String key, Type type) {
         return load2Flowable(key, type, BackpressureStrategy.LATEST);
     }
 
-    public <T> Flowable< CacheResult<T>> load2Flowable(final String key, final Type type, BackpressureStrategy backpressureStrategy) {
-        return Flowable.create(new FlowableOnSubscribe< CacheResult<T>>() {
+    public <T> Flowable<CacheResult<T>> load2Flowable(final String key, final Type type, BackpressureStrategy backpressureStrategy) {
+        return Flowable.create(new FlowableOnSubscribe<CacheResult<T>>() {
             @Override
-            public void subscribe(FlowableEmitter< CacheResult<T>> flowableEmitter) throws Exception {
+            public void subscribe(FlowableEmitter<CacheResult<T>> flowableEmitter) throws Exception {
                 CacheResult<T> load = cacheCore.load(getMD5MessageDigest(key), type);
                 if (!flowableEmitter.isCancelled()) {
-                    if(load!=null) {
+                    if (load != null) {
                         flowableEmitter.onNext(load);
                         flowableEmitter.onComplete();
-                    }else{
+                    } else {
                         flowableEmitter.onError(new NullPointerException("Not find the key corresponding to the cache"));
                     }
                 }
             }
         }, backpressureStrategy);
+    }
+
+
+    public <T> Observable<Boolean> save(final String key, final T value) {
+        return save(key, value, CacheTarget.MemoryAndDisk);
     }
 
     /**

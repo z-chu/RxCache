@@ -6,14 +6,15 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.Switch
 import android.widget.TextView
-import com.google.gson.reflect.TypeToken
+import android.widget.Toast
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import com.zchu.log.Logger
 import com.zchu.rxcache.RxCache
 import com.zchu.rxcache.data.CacheResult
 import com.zchu.rxcache.data.ResultFrom
 import com.zchu.rxcache.diskconverter.GsonDiskConverter
-import com.zchu.rxcache.kotlin.transformObservable
+import com.zchu.rxcache.kotlin.load
+import com.zchu.rxcache.kotlin.rxCache
 import com.zchu.rxcache.stategy.CacheStrategy
 import com.zchu.rxcache.stategy.IStrategy
 import io.reactivex.Observer
@@ -29,7 +30,6 @@ import java.util.*
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
     private var serverAPI: ServerAPI? = null
-    private var rxCache: RxCache? = null
     private var tvData: TextView? = null
     private var mSubscription: Disposable? = null
     private var swIsAsync: Switch? = null
@@ -48,7 +48,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 R.id.btn_only_cache,
                 R.id.btn_cache_and_remote,
                 R.id.btn_none,
-                R.id.btn_clean_cache
+                R.id.btn_clean_cache,
+                R.id.btn_load_cache,
+                R.id.btn_save_cache
         )
         serverAPI = Retrofit.Builder()
                 .baseUrl(ServerAPI.BASE_URL)
@@ -57,14 +59,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 .client(OkHttpClient.Builder().build())
                 .build()
                 .create(ServerAPI::class.java)
-        rxCache = RxCache.Builder()
+        RxCache.initializeDefault(RxCache.Builder()
                 .appVersion(2)
                 .diskDir(File(cacheDir.path + File.separator + "data-cache"))
                 .diskConverter(GsonDiskConverter())
                 .diskMax((20 * 1024 * 1024).toLong())
                 .memoryMax(0)
                 .setDebug(true)
-                .build()
+                .build())
         Logger.init("RxCache")
     }
 
@@ -77,36 +79,75 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onClick(view: View) {
         when (view.id) {
-            R.id.btn_first_remote -> if (swIsAsync!!.isChecked) {
-                loadData(CacheStrategy.firstRemote())
-            } else {
-                loadData(CacheStrategy.firstRemoteSync())
-            }
-            R.id.btn_first_cache -> if (swIsAsync!!.isChecked) {
-                loadData(CacheStrategy.firstCache())
-            } else {
-                loadData(CacheStrategy.firstCacheSync())
-            }
-            R.id.btn_first_cache_timeout -> if (swIsAsync!!.isChecked) {
-                loadData(CacheStrategy.firstCacheTimeout(5000))
-            } else {
-                loadData(CacheStrategy.firstCacheTimeoutSync(5000))
-            }
-            R.id.btn_only_remote -> if (swIsAsync!!.isChecked) {
-                loadData(CacheStrategy.onlyRemote())
-            } else {
-                loadData(CacheStrategy.onlyRemoteSync())
-            }
-            R.id.btn_only_cache -> loadData(CacheStrategy.onlyCache())
-            R.id.btn_cache_and_remote -> if (swIsAsync!!.isChecked) {
-                loadData(CacheStrategy.cacheAndRemote())
-            } else {
-                loadData(CacheStrategy.cacheAndRemoteSync())
-            }
-            R.id.btn_none -> loadData(CacheStrategy.none())
+            R.id.btn_first_remote ->
+                if (swIsAsync!!.isChecked) {
+                    loadData(CacheStrategy.firstRemote())
+                } else {
+                    loadData(CacheStrategy.firstRemoteSync())
+                }
+            R.id.btn_first_cache ->
+                if (swIsAsync!!.isChecked) {
+                    loadData(CacheStrategy.firstCache())
+                } else {
+                    loadData(CacheStrategy.firstCacheSync())
+                }
+            R.id.btn_first_cache_timeout ->
+                if (swIsAsync!!.isChecked) {
+                    loadData(CacheStrategy.firstCacheTimeout(5000))
+                } else {
+                    loadData(CacheStrategy.firstCacheTimeoutSync(5000))
+                }
+            R.id.btn_only_remote ->
+                if (swIsAsync!!.isChecked) {
+                    loadData(CacheStrategy.onlyRemote())
+                } else {
+                    loadData(CacheStrategy.onlyRemoteSync())
+                }
+            R.id.btn_only_cache ->
+                loadData(CacheStrategy.onlyCache())
+            R.id.btn_cache_and_remote ->
+                if (swIsAsync!!.isChecked) {
+                    loadData(CacheStrategy.cacheAndRemote())
+                } else {
+                    loadData(CacheStrategy.cacheAndRemoteSync())
+                }
+            R.id.btn_none ->
+                loadData(CacheStrategy.none())
+            R.id.btn_load_cache ->
+                RxCache.getDefault()
+                        .load<List<Movie.SubjectsBean>>("custom_key")
+                        .subscribe(object : Observer<CacheResult<List<Movie.SubjectsBean>>> {
+                            override fun onSubscribe(disposable: Disposable) {
+                                mSubscription = disposable
+                            }
 
+                            override fun onNext(listCacheResult: CacheResult<List<Movie.SubjectsBean>>) {
+                                Logger.e(listCacheResult)
+                                val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                                        .format(Date(listCacheResult.timestamp))
+                                tvData!!.text = "来自缓存  写入时间：" + format + "\n " + listCacheResult.data
+                            }
+
+                            override fun onError(throwable: Throwable) {
+                                tvData!!.text = throwable.message
+                            }
+
+                            override fun onComplete() {
+
+                            }
+                        })
+
+            R.id.btn_save_cache -> {
+                val subjectsBean = Movie.SubjectsBean()
+                subjectsBean.year = "测试数据：sava-year"
+                subjectsBean.title = "测试数据：sava-title"
+                RxCache.getDefault().save("custom_key", Arrays.asList(subjectsBean))
+                        ?.subscribe()
+
+                Toast.makeText(this,"已写入测试数据",Toast.LENGTH_SHORT).show()
+            }
             R.id.btn_clean_cache -> {
-                rxCache!!.clear().subscribe()
+                RxCache.getDefault().clear().subscribe()
                 tvData!!.text = "数据"
             }
         }
@@ -123,7 +164,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         serverAPI!!.inTheatersMovies
                 .map { it.subjects!! }
                 //泛型这样使用
-                .compose<CacheResult<List<Movie.SubjectsBean>>>(rxCache!!.transformObservable("getInTheatersMovies", strategy))
+                .rxCache("custom_key", strategy)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<CacheResult<List<Movie.SubjectsBean>>> {
