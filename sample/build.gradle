@@ -46,8 +46,8 @@ dependencies {
     implementation 'com.zchu:zlog:1.0.1'
 
 
-    compile project(':rxcache')
-    compile project(':rxcache-kotlin')
+    implementation 'com.zchu:rxcache:2.3.1'
+    implementation 'com.zchu:rxcache-kotlin:2.3.1'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
 }
