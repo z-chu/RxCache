@@ -31,7 +31,13 @@
 
 
 ## 引入
-
+```groovy
+allprojects {
+    repositories {     
+        maven{url 'https://dl.bintray.com/zchu/maven/'} 
+    }
+}
+```
 **RxJava 2.0**
 ```groovy
 compile 'com.zchu:rxcache:2.3.0'
