@@ -75,7 +75,8 @@ observable
 	
 ```
 
-你也可以使用默认的 `RxCache`，如果不手动初始化默认的 `RxCache`，缓存会默认保存到 `Environment.getDownloadCacheDirectory()`，且 `appVersion` 会永远为 `1`
+你也可以使用默认的 `RxCache`:
+
 
 初始化默认的 `RxCache`
 ```java
@@ -87,8 +88,7 @@ observable
 	.compose(RxCache.getDefault().<~>>transformObservable("custom_key", type, strategy))
 	...
 ```
-
-
+如果不初始化默认的 `RxCache`，缓存会默认保存到 `Environment.getDownloadCacheDirectory()`，且 `appVersion` 会永远为 `1`
 
 
 **推荐使用 kotlin** ，规避了泛型擦除，可不传 `type` :
