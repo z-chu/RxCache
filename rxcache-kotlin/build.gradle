@@ -12,7 +12,7 @@ android {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    compileOnly 'com.google.code.gson:gson:2.8.2'
+    compileOnly 'com.google.code.gson:gson:2.8.5'
     compileOnly 'io.reactivex.rxjava2:rxjava:2.1.8'
 
     compileOnly project(':rxcache')
@@ -21,7 +21,7 @@ publish {
     userOrg = 'zchu'
     groupId = 'com.zchu'
     artifactId = 'rxcache-kotlin'
-    publishVersion = '2.3.0'
+    publishVersion = '2.3.1'
     desc = 'This is a cache library for android'
     website = 'https://github.com/z-chu/RxCache'
 }
