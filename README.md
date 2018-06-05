@@ -40,11 +40,11 @@ allprojects {
 ```
 **RxJava 2.0**
 ```groovy
-compile 'com.zchu:rxcache:2.3.0'
+implementation 'com.zchu:rxcache:2.3.1'
 ```
 **可添加 Kotlin 扩展,解决泛型擦除问题**
 ```groovy
-compile 'com.zchu:rxcache-kotlin:2.3.0'
+implementation 'com.zchu:rxcache-kotlin:2.3.1'
 ```
 
 ## 如何使用
@@ -75,6 +75,22 @@ observable
 	
 ```
 
+你也可以使用默认的 `RxCache`，如果不手动初始化默认的 `RxCache`，缓存会默认保存到 `Environment.getDownloadCacheDirectory()`，且 `appVersion` 会永远为 `1`
+
+初始化默认的 `RxCache`
+```java
+RxCache.initializeDefault(rxcache)
+```
+再这样使用
+```java
+observable
+	.compose(RxCache.getDefault().<~>>transformObservable("custom_key", type, strategy))
+	...
+```
+
+
+
+
 **推荐使用 kotlin** ，规避了泛型擦除，可不传 `type` :
 
 ```kotlin
@@ -85,6 +101,15 @@ observable
 		  override fun onNext(listCacheResult: CacheResult<~>) {
 			val data = listCacheResult.data//获取你的数据
 		}
+		...
+	}
+	
+```
+还可以更简单
+```kotlin
+observable
+	.rxCache("custom_key", strategy) //这样会使用默认的 RxCache ，你也可以传入任意 rxcache 使用
+	.subscribe(object : Observer<CacheResult<~>>  {
 		...
 	}
 	
