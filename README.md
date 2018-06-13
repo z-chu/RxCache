@@ -30,7 +30,8 @@
 
 
 
-## 引入
+## Getting started
+### Add the dependencies
 ```groovy
 allprojects {
     repositories {     
@@ -47,9 +48,9 @@ implementation 'com.zchu:rxcache:2.3.1'
 implementation 'com.zchu:rxcache-kotlin:2.3.1'
 ```
 
-## 如何使用
+### 首先创建一个 RxCache 实例
 
-首先创建一个 RxCache 实例
+
 
 ```java
 rxCache = new RxCache.Builder()
@@ -74,7 +75,7 @@ observable
 	}
 	
 ```
-
+## The default rxCache
 你也可以使用默认的 `RxCache`:
 
 
@@ -88,24 +89,13 @@ observable
 	.compose(RxCache.getDefault().<~>>transformObservable("custom_key", type, strategy))
 	...
 ```
-如果不初始化默认的 `RxCache`，这样使用缓存会保存到 `Environment.getDownloadCacheDirectory()`，且 `appVersion` 会永远为 `1`
+如果不初始化默认的 `RxCache`，这样使用缓存会保存到 `Environment.getDownloadCacheDirectory()`，
+且 `appVersion` 会永远为 `1`
 
 
-**推荐使用 kotlin** ，规避了泛型擦除，可不传 `type` :
+## Kotlin
+**推荐使用 kotlin** ，规避了泛型擦除，可不传 `type`, 无比简单 :
 
-```kotlin
-observable
-	.compose<CacheResult<~>>(rxCache!!.transformObservable("custom_key", strategy))
-	.subscribe(object : Observer<CacheResult<~>>  {
-		...
-		  override fun onNext(listCacheResult: CacheResult<~>) {
-			val data = listCacheResult.data//获取你的数据
-		}
-		...
-	}
-	
-```
-还可以更简单
 ```kotlin
 observable
 	.rxCache("custom_key", strategy) //这样会使用默认的 RxCache ，你也可以传入任意 rxcache 使用
@@ -115,6 +105,7 @@ observable
 	
 ```
 
+## CacheResult
 `CacheResult` 类，包含的属性如下:
 
 ```java
@@ -127,7 +118,7 @@ public class CacheResult<T> {
 }
 ```
 
-## retrofit使用
+## Used by retrofit
 
 在如果你使用的是 [retrofit](https://github.com/square/retrofit) 那可原有代码的基础上，仅需2行代码搞定，**一步到位！！！**
 
@@ -144,28 +135,10 @@ Flowable 也是支持的
 ```
 在这里声明缓存策略即可，不影响原有代码结构
 
-调用示例：
-```java
-serverAPI.getInTheatersMovies()
-            .map(new Function<Movie, List<Movie.SubjectsBean>>() {
-                @Override
-                public List<Movie.SubjectsBean> apply(Movie movie) throws Exception {
-                    return movie.subjects;
-                }
-            })
-            //泛型这样使用
-            .compose(rxCache.<List<Movie.SubjectsBean>>transformObservable("getInTheatersMovies", new TypeToken<List<Movie.SubjectsBean>>() {
-            }.getType(), strategy))
-	    .map(new CacheResult.MapFunc<List<Movie.SubjectsBean>>())
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(...);
-
-```
 如何你纠结 Key 值的取名，建议使用 **("方法名"+"参数名："+"加参数值")**
 
 ## 泛型
-因为泛型擦除的原因，遇到 List<~> 这样的泛型时可以使用：
+因为泛型擦除的原因，遇到 List<~> 这样的泛型时可以这样使用：
 
 ```java
 // <~> 为List元素的数据类型
@@ -177,13 +150,13 @@ serverAPI.getInTheatersMovies()
 .compose(rxCache.<Bean>transformer("custom_key",Bean.class, strategy))
 ```
 
-**如果你使用 Kotlin 则无需传入 `Type`**
+**如果你使用 Kotlin 则没有这个问题**
 ```kotlin
-.compose<List<~>>(rxCache!!.transformObservable("custom_key", strategy))
+..rxCache(rxcache,"custom_key", strategy)
 ```
 
-## 策略选择
-`CacheStrategy` 类中可供选择的策略如下：
+## Strategy
+在`CacheStrategy` 类中提供如下缓存策略：
 
  策略选择                   | 摘要      
  ------------------------- | ------- 
@@ -201,7 +174,7 @@ serverAPI.getInTheatersMovies()
 如： `CacheStrategy.firstRemoteSync()`
 使用同步保存方式，数据会在缓存写入完以后才响应。
 
-## 其他用法
+## 基础用法
 
 ### 保存缓存：
 ```java
