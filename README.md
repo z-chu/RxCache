@@ -64,7 +64,7 @@ rxCache = new RxCache.Builder()
 再使用 `compose()`操作符变换, 注意把<~>替换成你的数据类型
 ```java
 observable
-	.compose(rxCache.<~>>transformObservable("custom_key", type, strategy))
+	.compose(rxCache.<~>>transformObservable("custom_key", type, CacheStrategy.firstCache()))
 	.subscribe(new Observer<CacheResult<~>>() {
 		...
 		@Override
@@ -75,49 +75,6 @@ observable
 	}
 	
 ```
-## Default rxCache
-你也可以使用默认的 `RxCache`:
-
-
-初始化默认的 `RxCache`
-```java
-RxCache.initializeDefault(rxcache)
-```
-再这样使用
-```java
-observable
-	.compose(RxCache.getDefault().<~>>transformObservable("custom_key", type, strategy))
-	...
-```
-如果不初始化默认的 `RxCache`，这样使用缓存会保存到 `Environment.getDownloadCacheDirectory()`，
-且 `appVersion` 会永远为 `1`
-
-
-## Kotlin
-**推荐使用 kotlin** ，规避了泛型擦除，可不传 `type`, 无比简单 :
-
-```kotlin
-observable
-	.rxCache("custom_key", strategy) //这样会使用默认的 RxCache ，你也可以传入任意 rxcache 使用
-	.subscribe(object : Observer<CacheResult<~>>  {
-		...
-	}
-	
-```
-
-## CacheResult
-`CacheResult` 类，包含的属性如下:
-
-```java
-public class CacheResult<T> {
-    private ResultFrom from;//数据来源，原始observable、内存或硬盘
-    private String key;
-    private T data; // 数据
-    private long timestamp; //数据写入到缓存时的时间戳，如果来自原始observable则为0
-	...
-}
-```
-
 ## Retrofit
 
 在如果你使用的是 [retrofit](https://github.com/square/retrofit) 那可原有代码的基础上，仅需2行代码搞定，**一步到位！！！**
@@ -125,35 +82,18 @@ public class CacheResult<T> {
 Observable 调用
 ```java
 //注意在 <~> 中声明数据源的类型
-.compose(rxCache.<~>transformObservable（key,type,strategy))
+.compose(rxCache.<~>transformObservable（key,type,CacheStrategy.firstCache()))
 .map(new CacheResult.MapFunc<~>())
 ```
-Flowable 也是支持的
+Flowable 调用
 ```java
-.compose(rxCache.<~>transformFlowable（key,type,strategy))
+.compose(rxCache.<~>transformFlowable（key,type,CacheStrategy.firstCache()))
 .map(new CacheResult.MapFunc<~>())
 ```
 在这里声明缓存策略即可，不影响原有代码结构
 
 如何你纠结 Key 值的取名，建议使用 **("方法名"+"参数名："+"加参数值")**
 
-## 泛型
-因为泛型擦除的原因，遇到 List<~> 这样的泛型时可以这样使用：
-
-```java
-// <~> 为List元素的数据类型
-.compose(rxCache.<List<~>>transformer("custom_key", new TypeToken<List<~>>() {}.getType(), strategy))
-```
-
-没有泛型时 Type 直接传 Class 即可
-```java
-.compose(rxCache.<Bean>transformer("custom_key",Bean.class, strategy))
-```
-
-**如果你使用 Kotlin 则没有这个问题**
-```kotlin
-..rxCache(rxcache,"custom_key", strategy)
-```
 
 ## Strategy
 在`CacheStrategy` 类中提供如下缓存策略：
@@ -174,11 +114,83 @@ Flowable 也是支持的
 如： `CacheStrategy.firstRemoteSync()`
 使用同步保存方式，数据会在缓存写入完以后才响应。
 
+
+## CacheResult
+`CacheResult` 类，包含的属性如下:
+
+```java
+public class CacheResult<T> {
+    private ResultFrom from;//数据来源，原始observable、内存或硬盘
+    private String key;
+    private T data; // 数据
+    private long timestamp; //数据写入到缓存时的时间戳，如果来自原始observable则为0
+	...
+}
+```
+
+
+## Default rxCache
+你也可以使用默认的 `RxCache`:
+<br/>
+初始化默认的 `RxCache`
+```java
+RxCache.initializeDefault(rxcache)
+```
+再这样使用
+```java
+observable
+	.compose(RxCache.getDefault().<~>>transformObservable("custom_key", type, strategy))
+	...
+```
+如果不初始化默认的 `RxCache`，这样使用缓存会保存到 `Environment.getDownloadCacheDirectory()`，<br/>且 `appVersion` 会永远为 `1`
+
+
+## Kotlin
+**推荐使用 kotlin** ，规避了泛型擦除，可不传 `type`, 无比简单 :
+
+```kotlin
+observable
+	.rxCache("custom_key", strategy) //这样会使用默认的 RxCache ，你也可以传入任意 rxcache 使用
+	.subscribe(object : Observer<CacheResult<~>>  {
+		...
+	}
+	
+```
+
+
+
+
+
+
+## 泛型
+因为泛型擦除的原因，遇到 List<~> 这样的泛型时可以这样使用：
+
+```java
+// <~> 为List元素的数据类型
+.compose(rxCache.<List<~>>transformer("custom_key", new TypeToken<List<~>>() {}.getType(), strategy))
+```
+
+没有泛型时 Type 直接传 Class 即可
+```java
+.compose(rxCache.<Bean>transformer("custom_key",Bean.class, strategy))
+```
+
+**如果你使用 Kotlin 则没有这个问题**
+```kotlin
+..rxCache(rxcache,"custom_key", strategy)
+```
+
+
+
 ## 基础用法
 
 ### 保存缓存：
+如 保存字符串到内存和硬盘：
 ```java
-<T> Observable<Boolean> save(final String key, final T value, final CacheTarget target)
+rxCache
+	.save("test_key1","RxCache is simple", CacheTarget.MemoryAndDisk)
+	.subscribeOn(Schedulers.io())
+	.subscribe();
 ```
 保存方式提供了 3 种选择：
 ```java
@@ -189,19 +201,10 @@ public enum CacheTarget {
 ...
 }
 ```
-如 保存字符串到内存和硬盘：
-```java
-rxCache
-	.save("test_key1","RxCache is simple", CacheTarget.MemoryAndDisk)
-	.subscribeOn(Schedulers.io())
-	.subscribe();
-```
+
 
 ### 读取缓存：
 读取的顺序会按照内存-->硬盘的顺序读取
-```java
-<T> Observable<CacheResult<T>> load(final String key, final Type type)
-```
 如 读取缓存中的字符串：
 ```java
  rxCache
@@ -214,6 +217,7 @@ rxCache
 		}
 	});
 ```
+
 
 
 ## 混淆配置
