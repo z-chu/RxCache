@@ -95,7 +95,7 @@ Flowable 调用
 如何你纠结 Key 值的取名，建议使用 **("方法名"+"参数名："+"加参数值")**
 
 
-## Strategy
+## CacheStrategy
 在`CacheStrategy` 类中提供如下缓存策略：
 
  策略选择                   | 摘要      
@@ -142,7 +142,7 @@ observable
 	.compose(RxCache.getDefault().<~>>transformObservable("custom_key", type, strategy))
 	...
 ```
-如果不初始化默认的 `RxCache`，这样使用缓存会保存到 `Environment.getDownloadCacheDirectory()`，<br/>且 `appVersion` 会永远为 `1`
+如果不初始化默认的 `RxCache`，这样使用缓存会保存到 `Environment.getDownloadCacheDirectory()` <br/> 且 `appVersion` 会永远为 `1`
 
 
 ## Kotlin
@@ -177,7 +177,7 @@ observable
 
 **如果你使用 Kotlin 则没有这个问题**
 ```kotlin
-..rxCache(rxcache,"custom_key", strategy)
+.rxCache(rxcache,"custom_key", strategy)
 ```
 
 
