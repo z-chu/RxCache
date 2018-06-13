@@ -75,7 +75,7 @@ observable
 	}
 	
 ```
-## The default rxCache
+## Default rxCache
 你也可以使用默认的 `RxCache`:
 
 
@@ -118,7 +118,7 @@ public class CacheResult<T> {
 }
 ```
 
-## Used by retrofit
+## Retrofit
 
 在如果你使用的是 [retrofit](https://github.com/square/retrofit) 那可原有代码的基础上，仅需2行代码搞定，**一步到位！！！**
 
