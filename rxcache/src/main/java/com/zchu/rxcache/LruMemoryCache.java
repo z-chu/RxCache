@@ -4,18 +4,16 @@ package com.zchu.rxcache;
 import android.graphics.Bitmap;
 import android.support.v4.util.LruCache;
 
-import com.zchu.rxcache.data.CacheResult;
 import com.zchu.rxcache.utils.LogUtils;
 import com.zchu.rxcache.utils.MemorySizeOf;
 import com.zchu.rxcache.utils.Occupy;
 
-import java.security.Key;
 import java.util.HashMap;
 
 /**
  * Created by Chu on 2016/9/10.
  */
-class LruMemoryCache {
+public class LruMemoryCache {
     private LruCache<String, Object> mCache;
     private HashMap<String, Integer> memorySizeMap;//储存初次加入缓存的size，规避对象在内存中大小变化造成的测量出错
     private HashMap<String, Long> timestampMap;
@@ -35,6 +33,13 @@ class LruMemoryCache {
                     return 0;
                 }
                 return integer;
+            }
+
+            @Override
+            protected void entryRemoved(boolean evicted, String key, Object oldValue, Object newValue) {
+                super.entryRemoved(evicted, key, oldValue, newValue);
+                memorySizeMap.remove(key);
+                timestampMap.remove(key);
             }
         };
     }
@@ -62,10 +67,8 @@ class LruMemoryCache {
 
     /**
      * 删除缓存
-     *
-     * @param key
      */
-    public final boolean remove(String key) {
+    public boolean remove(String key) {
         Object remove = mCache.remove(key);
         if (remove != null) {
             memorySizeMap.remove(key);
@@ -80,7 +83,7 @@ class LruMemoryCache {
         memorySizeMap.clear();
     }
 
-    private long countSize(Object value) {
+    protected long countSize(Object value) {
         if (value == null) {
             return 0;
         }
@@ -94,7 +97,7 @@ class LruMemoryCache {
             size = occupy.occupyof(value);
         }
         LogUtils.debug("size=" + size + " value=" + value);
-        return size;
+        return size > 0 ? size : 1;
     }
 
 }

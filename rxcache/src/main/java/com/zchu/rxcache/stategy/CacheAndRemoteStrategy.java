@@ -8,6 +8,7 @@ import com.zchu.rxcache.data.CacheResult;
 import org.reactivestreams.Publisher;
 
 import java.lang.reflect.Type;
+import java.util.Arrays;
 
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
@@ -31,36 +32,36 @@ public final class CacheAndRemoteStrategy implements IStrategy {
 
     @Override
     public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type) {
-        Observable<CacheResult<T>> cache = RxCacheHelper.loadCache(rxCache, key, type, true);
+        Observable<CacheResult<T>> cache = RxCacheHelper.loadCache(rxCache, key, type, false);
         Observable<CacheResult<T>> remote;
         if (isSync) {
             remote = RxCacheHelper.loadRemoteSync(rxCache, key, source, CacheTarget.MemoryAndDisk, false);
         } else {
             remote = RxCacheHelper.loadRemote(rxCache, key, source, CacheTarget.MemoryAndDisk, false);
         }
-        return Observable.concat(cache, remote)
+        return Observable.concatDelayError(Arrays.asList(cache, remote))
                 .filter(new Predicate<CacheResult<T>>() {
                     @Override
                     public boolean test(@NonNull CacheResult<T> result) throws Exception {
-                        return result != null && result.getData() != null;
+                        return result.getData() != null;
                     }
                 });
     }
 
     @Override
     public <T> Publisher<CacheResult<T>> flow(RxCache rxCache, String key, Flowable<T> source, Type type) {
-        Flowable<CacheResult<T>> cache = RxCacheHelper.loadCacheFlowable(rxCache, key, type, true);
+        Flowable<CacheResult<T>> cache = RxCacheHelper.loadCacheFlowable(rxCache, key, type, false);
         Flowable<CacheResult<T>> remote;
         if (isSync) {
             remote = RxCacheHelper.loadRemoteSyncFlowable(rxCache, key, source, CacheTarget.MemoryAndDisk, false);
         } else {
             remote = RxCacheHelper.loadRemoteFlowable(rxCache, key, source, CacheTarget.MemoryAndDisk, false);
         }
-        return Flowable.concat(cache, remote)
+        return Flowable.concatDelayError(Arrays.asList(cache, remote))
                 .filter(new Predicate<CacheResult<T>>() {
                     @Override
                     public boolean test(@NonNull CacheResult<T> result) throws Exception {
-                        return result != null && result.getData() != null;
+                        return result.getData() != null;
                     }
                 });
     }

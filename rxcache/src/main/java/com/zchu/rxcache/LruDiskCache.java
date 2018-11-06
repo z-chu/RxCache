@@ -1,7 +1,6 @@
 package com.zchu.rxcache;
 
 import com.jakewharton.disklrucache.DiskLruCache;
-import com.jakewharton.disklrucache.Util;
 import com.zchu.rxcache.diskconverter.IDiskConverter;
 import com.zchu.rxcache.utils.LogUtils;
 
@@ -14,12 +13,12 @@ import java.lang.reflect.Type;
 /**
  * Created by Z.Chu on 2016/9/10.
  */
-class LruDiskCache {
+public class LruDiskCache {
     private IDiskConverter mDiskConverter;
     private DiskLruCache mDiskLruCache;
 
 
-    LruDiskCache(IDiskConverter diskConverter, File diskDir, int appVersion, long diskMaxSize) {
+    public LruDiskCache(IDiskConverter diskConverter, File diskDir, int appVersion, long diskMaxSize) {
         this.mDiskConverter = diskConverter;
         try {
             mDiskLruCache = DiskLruCache.open(diskDir, appVersion, 2, diskMaxSize);
@@ -28,7 +27,7 @@ class LruDiskCache {
         }
     }
 
-    <T> CacheHolder<T> load(String key, Type type) {
+    public <T> CacheHolder<T> load(String key, Type type) {
         if (mDiskLruCache == null) {
             return null;
         }
@@ -52,7 +51,7 @@ class LruDiskCache {
     }
 
 
-    <T> boolean save(String key, T value) {
+    public <T> boolean save(String key, T value) {
         if (mDiskLruCache == null) {
             return false;
         }
@@ -68,7 +67,7 @@ class LruDiskCache {
             long l = System.currentTimeMillis();
             edit.set(1, String.valueOf(l));
             edit.commit();
-            LogUtils.log("save:  value="+value+" , status="+true);
+            LogUtils.log("save:  value=" + value + " , status=" + true);
             return true;
         } catch (IOException e) {
             LogUtils.log(e);
@@ -79,13 +78,13 @@ class LruDiskCache {
                     LogUtils.log(e1);
                 }
             }
-            LogUtils.log("save:  value="+value+" , status="+false);
+            LogUtils.log("save:  value=" + value + " , status=" + false);
         }
         return false;
     }
 
 
-    boolean containsKey(String key) {
+    public boolean containsKey(String key) {
         try {
             return mDiskLruCache.get(key) != null;
         } catch (IOException e) {
@@ -97,7 +96,7 @@ class LruDiskCache {
     /**
      * 删除缓存
      */
-    final boolean remove(String key) {
+    public boolean remove(String key) {
         try {
             return mDiskLruCache.remove(key);
         } catch (IOException e) {
@@ -106,7 +105,7 @@ class LruDiskCache {
         return false;
     }
 
-    void clear() throws IOException {
+    public void clear() throws IOException {
         deleteContents(mDiskLruCache.getDirectory());
     }
 

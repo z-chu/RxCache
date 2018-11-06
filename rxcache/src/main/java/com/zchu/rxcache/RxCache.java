@@ -64,17 +64,8 @@ public final class RxCache {
     }
 
 
-    private RxCache(Builder builder) {
-        LruMemoryCache memoryCache = null;
-        if (builder.memoryMaxSize > 0) {
-            memoryCache = new LruMemoryCache(builder.memoryMaxSize);
-        }
-        LruDiskCache lruDiskCache = null;
-        if (builder.diskMaxSize > 0) {
-            lruDiskCache = new LruDiskCache(builder.diskConverter, builder.diskDir, builder.appVersion, builder.diskMaxSize);
-        }
-        cacheCore = new CacheCore(memoryCache, lruDiskCache);
-
+    private RxCache(CacheCore cacheCore) {
+        this.cacheCore = cacheCore;
     }
 
     /**
@@ -297,23 +288,33 @@ public final class RxCache {
         }
 
         public RxCache build() {
-            if (this.diskDir == null) {
-                throw new NullPointerException("DiskDir can not be null.");
+            appVersion = Math.max(1, this.appVersion);
+            if (diskDir != null) {
+                if (!diskDir.exists() && !diskDir.mkdirs()) {
+                    throw new RuntimeException("can't make dirs in " + diskDir.getAbsolutePath());
+                }
+                if (this.diskConverter == null) {
+                    this.diskConverter = new SerializableDiskConverter();
+                }
+                if (diskMaxSize == null) {
+                    diskMaxSize = calculateDiskCacheSize(diskDir);
+                }
             }
-            if (!diskDir.exists() && !diskDir.mkdirs()) {
-                throw new RuntimeException("can't make dirs in " + diskDir.getAbsolutePath());
-            }
-            if (this.diskConverter == null) {
-                this.diskConverter = new SerializableDiskConverter();
-            }
+
             if (memoryMaxSize == null) {
                 memoryMaxSize = DEFAULT_MEMORY_CACHE_SIZE;
             }
-            if (diskMaxSize == null) {
-                diskMaxSize = calculateDiskCacheSize(diskDir);
+
+            LruMemoryCache memoryCache = null;
+            if (memoryMaxSize > 0) {
+                memoryCache = new LruMemoryCache(memoryMaxSize);
             }
-            appVersion = Math.max(1, this.appVersion);
-            return new RxCache(this);
+            LruDiskCache lruDiskCache = null;
+            if (diskDir != null && diskMaxSize > 0) {
+                lruDiskCache = new LruDiskCache(diskConverter, diskDir, appVersion, diskMaxSize);
+            }
+            CacheCore cacheCore = new CacheCore(memoryCache, lruDiskCache);
+            return new RxCache(cacheCore);
         }
 
         private static long calculateDiskCacheSize(File dir) {

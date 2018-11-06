@@ -1,6 +1,6 @@
 package com.zchu.rxcache;
 
-class CacheHolder<T> {
+public class CacheHolder<T> {
 
     public CacheHolder(T data, long timestamp) {
         this.data = data;

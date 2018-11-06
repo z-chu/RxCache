@@ -1,12 +1,13 @@
 package com.zchu.rxcache;
 
 
+import android.support.annotation.Nullable;
+
 import com.zchu.rxcache.data.CacheResult;
 import com.zchu.rxcache.data.ResultFrom;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.security.Key;
 
 /**
  * 缓存核心
@@ -14,10 +15,12 @@ import java.security.Key;
  */
 class CacheCore {
 
+    @Nullable
     private LruMemoryCache memory;
+    @Nullable
     private LruDiskCache disk;
 
-    CacheCore(LruMemoryCache memory, LruDiskCache disk) {
+    CacheCore(@Nullable LruMemoryCache memory, @Nullable LruDiskCache disk) {
         this.memory = memory;
         this.disk = disk;
     }
@@ -71,7 +74,7 @@ class CacheCore {
      * 是否包含
      */
     boolean containsKey(String key) {
-        return memory != null && memory.containsKey(key) || disk != null && disk.containsKey(key);
+        return (memory != null && memory.containsKey(key)) || (disk != null && disk.containsKey(key));
     }
 
     /**
@@ -83,7 +86,7 @@ class CacheCore {
             isRemove = memory.remove(key);
         }
         if (disk != null) {
-            isRemove = isRemove && disk.remove(key);
+            isRemove = isRemove & disk.remove(key);
         }
         return isRemove;
     }

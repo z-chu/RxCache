@@ -1,15 +1,9 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.novoda.bintray-release'
+apply plugin: "guru.stefma.bintrayrelease"
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
 
-    defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 27
-        versionCode 6
-        versionName "2.3.1"
-    }
     buildTypes {
         release {
             minifyEnabled false
@@ -23,18 +17,22 @@ android {
 }
 
 dependencies {
-    implementation 'com.android.support:support-v4:27.1.1'
-    implementation 'io.reactivex.rxjava2:rxjava:2.1.8'
-    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
-    api 'com.google.code.gson:gson:2.8.5'
-    api 'com.jakewharton:disklrucache:2.0.2'
+    compileOnly 'com.android.support:support-v4:27.1.1'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.0'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
+    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.jakewharton:disklrucache:2.0.2'
+}
+
+
+version = "2.3.2"
+group = "com.zchu"
+androidArtifact { // 2
+    artifactId = "rxcache"
 }
 
 publish {
     userOrg = 'zchu'
-    groupId = 'com.zchu'
-    artifactId = 'rxcache'
-    publishVersion = '2.3.1'
     desc = 'This is a cache library for android'
     website = 'https://github.com/z-chu/RxCache'
 }

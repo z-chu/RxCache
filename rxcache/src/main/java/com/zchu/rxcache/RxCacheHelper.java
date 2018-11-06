@@ -29,7 +29,8 @@ public class RxCacheHelper {
 
     public static <T> Observable<CacheResult<T>> loadCache(final RxCache rxCache, final String key, Type type, final boolean needEmpty) {
         Observable<CacheResult<T>> observable = rxCache
-                .<T>load(key, type);
+                .<T>load(key, type)
+                .subscribeOn(Schedulers.io());
         if (needEmpty) {
             observable = observable
                     .onErrorResumeNext(new Function<Throwable, ObservableSource<? extends CacheResult<T>>>() {
