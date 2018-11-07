@@ -30,7 +30,8 @@ public class LruMemoryCache {
             protected int sizeOf(String key, Object value) {
                 Integer integer = memorySizeMap.get(key);
                 if (integer == null) {
-                    return 0;
+                    integer = countSize(value);
+                    memorySizeMap.put(key, integer);
                 }
                 return integer;
             }
@@ -54,7 +55,7 @@ public class LruMemoryCache {
 
     public <T> boolean save(String key, T value) {
         if (null != value) {
-            memorySizeMap.put(key, (int) countSize(value));
+
             mCache.put(key, value);
             timestampMap.put(key, System.currentTimeMillis());
         }
@@ -62,7 +63,7 @@ public class LruMemoryCache {
     }
 
     public boolean containsKey(String key) {
-        return memorySizeMap.containsKey(key);
+        return mCache.get(key) != null;
     }
 
     /**
@@ -80,16 +81,15 @@ public class LruMemoryCache {
 
     public void clear() {
         mCache.evictAll();
-        memorySizeMap.clear();
     }
 
-    protected long countSize(Object value) {
+    protected int countSize(Object value) {
         if (value == null) {
             return 0;
         }
 
         //  更优良的内存大小算法
-        long size;
+        int size;
         if (value instanceof Bitmap) {
             LogUtils.debug("Bitmap");
             size = MemorySizeOf.sizeOf((Bitmap) value);

@@ -23,11 +23,11 @@ public class MemorySizeOf {
      * @return Size in bytes of the object or -1 if the object
      * is null.
      */
-    public static long sizeOf(Serializable serial) throws IOException {
+    public static int sizeOf(Serializable serial) throws IOException {
         if (serial == null) {
             return 0;
         }
-        long size = -1;
+        int size;
         ByteArrayOutputStream baos = null;
         ObjectOutputStream oos = null;
         try {
@@ -44,12 +44,12 @@ public class MemorySizeOf {
     }
 
 
-    public static long sizeOf(Bitmap bitmap) {
+    public static int sizeOf(Bitmap bitmap) {
         if (bitmap == null) {
             return 0;
         }
 
-        long size = -1;
+        int size;
         ByteArrayOutputStream baos = null;
         try {
             baos = new ByteArrayOutputStream();
