@@ -41,11 +41,11 @@ allprojects {
 ```
 **RxJava 2.0**
 ```groovy
-implementation 'com.zchu:rxcache:2.3.1'
+implementation 'com.zchu:rxcache:2.3.3'
 ```
 **可添加 Kotlin 扩展,解决泛型擦除问题**
 ```groovy
-implementation 'com.zchu:rxcache-kotlin:2.3.1'
+implementation 'com.zchu:rxcache-kotlin:2.3.3'
 ```
 
 ### 首先创建一个 RxCache 实例
