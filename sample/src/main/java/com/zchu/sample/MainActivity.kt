@@ -1,12 +1,12 @@
 package com.zchu.sample
 
 import android.os.Bundle
-import android.support.annotation.IdRes
-import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.IdRes
+import androidx.appcompat.app.AppCompatActivity
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import com.zchu.log.Logger
 import com.zchu.rxcache.RxCache

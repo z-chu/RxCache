@@ -2,7 +2,6 @@ package com.zchu.rxcache;
 
 import android.os.Environment;
 import android.os.StatFs;
-import android.support.annotation.NonNull;
 
 import com.zchu.rxcache.data.CacheResult;
 import com.zchu.rxcache.diskconverter.IDiskConverter;
@@ -18,6 +17,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.security.MessageDigest;
 
+import androidx.annotation.NonNull;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableEmitter;

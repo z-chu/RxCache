@@ -32,7 +32,7 @@ public final class CacheAndRemoteStrategy implements IStrategy {
 
     @Override
     public <T> Observable<CacheResult<T>> execute(RxCache rxCache, String key, Observable<T> source, Type type) {
-        Observable<CacheResult<T>> cache = RxCacheHelper.loadCache(rxCache, key, type, false);
+        Observable<CacheResult<T>> cache = RxCacheHelper.loadCache(rxCache, key, type, true);
         Observable<CacheResult<T>> remote;
         if (isSync) {
             remote = RxCacheHelper.loadRemoteSync(rxCache, key, source, CacheTarget.MemoryAndDisk, false);
@@ -50,7 +50,7 @@ public final class CacheAndRemoteStrategy implements IStrategy {
 
     @Override
     public <T> Publisher<CacheResult<T>> flow(RxCache rxCache, String key, Flowable<T> source, Type type) {
-        Flowable<CacheResult<T>> cache = RxCacheHelper.loadCacheFlowable(rxCache, key, type, false);
+        Flowable<CacheResult<T>> cache = RxCacheHelper.loadCacheFlowable(rxCache, key, type, true);
         Flowable<CacheResult<T>> remote;
         if (isSync) {
             remote = RxCacheHelper.loadRemoteSyncFlowable(rxCache, key, source, CacheTarget.MemoryAndDisk, false);

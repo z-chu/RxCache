@@ -85,10 +85,12 @@ public class LruDiskCache {
 
 
     public boolean containsKey(String key) {
-        try {
-            return mDiskLruCache.get(key) != null;
-        } catch (IOException e) {
-            LogUtils.log(e);
+        if (mDiskLruCache != null) {
+            try {
+                return mDiskLruCache.get(key) != null;
+            } catch (IOException e) {
+                LogUtils.log(e);
+            }
         }
         return false;
     }
@@ -97,16 +99,20 @@ public class LruDiskCache {
      * 删除缓存
      */
     public boolean remove(String key) {
-        try {
-            return mDiskLruCache.remove(key);
-        } catch (IOException e) {
-            LogUtils.log(e);
+        if (mDiskLruCache != null) {
+            try {
+                return mDiskLruCache.remove(key);
+            } catch (IOException e) {
+                LogUtils.log(e);
+            }
         }
         return false;
     }
 
     public void clear() throws IOException {
-        deleteContents(mDiskLruCache.getDirectory());
+        if (mDiskLruCache != null) {
+            deleteContents(mDiskLruCache.getDirectory());
+        }
     }
 
     private static void deleteContents(File dir) throws IOException {

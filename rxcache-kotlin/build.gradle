@@ -17,7 +17,7 @@ dependencies {
     compileOnly project(':rxcache')
 }
 
-version = "2.3.3"
+version = "2.3.5"
 group = "com.zchu"
 androidArtifact { // 2
     artifactId = "rxcache-kotlin"

@@ -1,13 +1,13 @@
 package com.zchu.rxcache;
 
 
-import android.support.annotation.Nullable;
-
 import com.zchu.rxcache.data.CacheResult;
 import com.zchu.rxcache.data.ResultFrom;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+
+import androidx.annotation.Nullable;
 
 /**
  * 缓存核心
