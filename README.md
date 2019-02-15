@@ -218,6 +218,11 @@ public enum CacheTarget {
 	});
 ```
 
+同步获取缓存：
+```java
+ CacheResult<String> = rxCache.<String>loadSync("test_key1", String.class);
+```
+
 
 
 ## 混淆配置

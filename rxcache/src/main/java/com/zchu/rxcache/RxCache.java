@@ -96,6 +96,15 @@ public final class RxCache {
 
 
     /**
+     * 同步读取缓存
+     * 会阻塞主线程，请在子线程调用
+     */
+    public <T> CacheResult<T> loadSync(final String key, final Type type) {
+        return cacheCore.load(getMD5MessageDigest(key), type);
+    }
+
+
+    /**
      * 读取
      */
     public <T> Observable<CacheResult<T>> load(final String key, final Type type) {
