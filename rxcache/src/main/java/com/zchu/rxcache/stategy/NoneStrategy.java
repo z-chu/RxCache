@@ -8,10 +8,10 @@ import org.reactivestreams.Publisher;
 
 import java.lang.reflect.Type;
 
-import io.reactivex.Flowable;
-import io.reactivex.Observable;
-import io.reactivex.annotations.NonNull;
-import io.reactivex.functions.Function;
+import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.functions.Function;
 
 
 /**

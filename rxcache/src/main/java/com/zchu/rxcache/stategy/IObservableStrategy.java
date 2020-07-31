@@ -6,7 +6,7 @@ import com.zchu.rxcache.data.CacheResult;
 
 import java.lang.reflect.Type;
 
-import io.reactivex.Observable;
+import io.reactivex.rxjava3.core.Observable;
 
 
 /**

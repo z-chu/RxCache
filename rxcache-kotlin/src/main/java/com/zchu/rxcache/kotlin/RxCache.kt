@@ -5,7 +5,7 @@ import com.zchu.rxcache.RxCache
 import com.zchu.rxcache.data.CacheResult
 import com.zchu.rxcache.stategy.IFlowableStrategy
 import com.zchu.rxcache.stategy.IObservableStrategy
-import io.reactivex.*
+import io.reactivex.rxjava3.core.*
 
 inline fun <reified T> RxCache.load(key: String): Observable<CacheResult<T>> {
     return load<T>(key, object : TypeToken<T>() {}.type)

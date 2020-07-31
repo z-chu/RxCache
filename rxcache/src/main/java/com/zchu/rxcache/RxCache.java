@@ -3,6 +3,8 @@ package com.zchu.rxcache;
 import android.os.Environment;
 import android.os.StatFs;
 
+import androidx.annotation.NonNull;
+
 import com.zchu.rxcache.data.CacheResult;
 import com.zchu.rxcache.diskconverter.IDiskConverter;
 import com.zchu.rxcache.diskconverter.SerializableDiskConverter;
@@ -17,17 +19,16 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.security.MessageDigest;
 
-import androidx.annotation.NonNull;
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
-import io.reactivex.FlowableEmitter;
-import io.reactivex.FlowableOnSubscribe;
-import io.reactivex.FlowableTransformer;
-import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.ObservableSource;
-import io.reactivex.ObservableTransformer;
+import io.reactivex.rxjava3.core.BackpressureStrategy;
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.FlowableEmitter;
+import io.reactivex.rxjava3.core.FlowableOnSubscribe;
+import io.reactivex.rxjava3.core.FlowableTransformer;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.ObservableEmitter;
+import io.reactivex.rxjava3.core.ObservableOnSubscribe;
+import io.reactivex.rxjava3.core.ObservableSource;
+import io.reactivex.rxjava3.core.ObservableTransformer;
 
 
 /**

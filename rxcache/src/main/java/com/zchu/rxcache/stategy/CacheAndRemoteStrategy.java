@@ -1,5 +1,7 @@
 package com.zchu.rxcache.stategy;
 
+import androidx.annotation.NonNull;
+
 import com.zchu.rxcache.CacheTarget;
 import com.zchu.rxcache.RxCache;
 import com.zchu.rxcache.RxCacheHelper;
@@ -10,10 +12,10 @@ import org.reactivestreams.Publisher;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 
-import io.reactivex.Flowable;
-import io.reactivex.Observable;
-import io.reactivex.annotations.NonNull;
-import io.reactivex.functions.Predicate;
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.functions.Predicate;
+
 
 /**
  * 先缓存，后网络

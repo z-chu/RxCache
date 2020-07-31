@@ -13,38 +13,45 @@ public final class LogUtils {
 
     public static void log(Object message) {
         StackTraceElement element = new Throwable().getStackTrace()[1];
-        print(element, message, null);
+        print(false, element, message, null);
     }
     public static void log(Object message, Throwable error) {
         StackTraceElement element = new Throwable().getStackTrace()[1];
-        print(element, message, error);
+        print(false, element, message, error);
     }
 
     public static void debug(Object message) {
         if (DEBUG) {
             StackTraceElement element = new Throwable().getStackTrace()[1];
-            print(element, message, null);
+            print(true, element, message, null);
         }
     }
     public static void debug(Object message, Throwable error) {
         if (DEBUG) {
             StackTraceElement element = new Throwable().getStackTrace()[1];
-            print(element, message, error);
+            print(true, element, message, error);
         }
     }
 
 
-
-    private static void print(StackTraceElement element, Object message, Throwable error) {
+    private static void print(boolean isDebug, StackTraceElement element, Object message, Throwable error) {
         String className = element.getClassName();
         className = className.substring(className.lastIndexOf('.') + 1);
-        String tag = className+'.'+element.getMethodName()+'('+element.getFileName()+':'+element.getLineNumber()+')';
+        String tag = className + '.' + element.getMethodName() + '(' + element.getFileName() + ':' + element.getLineNumber() + ')';
         String text = toString(message);
 
         if (error != null) {
-            Log.e("[RxCache]", tag + "\n\t" + text, error);
+            if (isDebug) {
+                Log.d("[RxCache]", tag + "\n\t" + text, error);
+            } else {
+                Log.e("[RxCache]", tag + "\n\t" + text, error);
+            }
         } else {
-            Log.e("[RxCache]", tag + "\n\t" + text);
+            if (isDebug) {
+                Log.d("[RxCache]", tag + "\n\t" + text);
+            } else {
+                Log.e("[RxCache]", tag + "\n\t" + text);
+            }
         }
     }
 

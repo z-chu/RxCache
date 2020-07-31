@@ -8,12 +8,16 @@ android {
         abortOnError false
         checkReleaseBuilds false
     }
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
 }
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    compileOnly 'com.google.code.gson:gson:2.8.5'
-    compileOnly 'io.reactivex.rxjava2:rxjava:2.2.0'
+    compileOnly 'com.google.code.gson:gson:2.8.6'
+    implementation "io.reactivex.rxjava3:rxjava:3.0.4"
     compileOnly project(':rxcache')
 }
 

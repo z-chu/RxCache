@@ -1,6 +1,7 @@
 package com.zchu.rxcache.data;
 
-import io.reactivex.functions.Function;
+
+import io.reactivex.rxjava3.functions.Function;
 
 /**
  * 数据

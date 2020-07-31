@@ -9,9 +9,10 @@ import org.reactivestreams.Publisher;
 
 import java.lang.reflect.Type;
 
-import io.reactivex.Flowable;
-import io.reactivex.Observable;
-import io.reactivex.functions.Predicate;
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.functions.Predicate;
+
 
 /**
  * 优先缓存并可设置超时时间

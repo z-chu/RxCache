@@ -2,6 +2,8 @@ package com.zchu.rxcache;
 
 import android.annotation.SuppressLint;
 
+import androidx.annotation.NonNull;
+
 import com.zchu.rxcache.data.CacheResult;
 import com.zchu.rxcache.data.ResultFrom;
 import com.zchu.rxcache.utils.LogUtils;
@@ -11,13 +13,13 @@ import org.reactivestreams.Publisher;
 import java.lang.reflect.Type;
 import java.util.ConcurrentModificationException;
 
-import io.reactivex.Flowable;
-import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
-import io.reactivex.annotations.NonNull;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
-import io.reactivex.schedulers.Schedulers;
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.ObservableSource;
+import io.reactivex.rxjava3.functions.Consumer;
+import io.reactivex.rxjava3.functions.Function;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+
 
 /**
  * author : zchu

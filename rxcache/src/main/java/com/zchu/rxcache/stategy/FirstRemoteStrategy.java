@@ -10,8 +10,9 @@ import org.reactivestreams.Publisher;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 
-import io.reactivex.Flowable;
-import io.reactivex.Observable;
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.Observable;
+
 
 /**
  * 优先网络
