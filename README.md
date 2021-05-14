@@ -41,12 +41,12 @@ allprojects {
 ```
 **RxJava 2.0**
 ```groovy
-implementation 'com.github.z-chu:RxCache:2.3.5'
+implementation 'com.github.z-chu.RxCache:rxcache:2.3.5'
 ```
 
 **RxJava 3.0**
 ```groovy
-implementation 'com.github.z-chu:RxCache:3.0.0'
+implementation 'com.github.z-chu.RxCache:rxcache:3.0.0'
 ```
 
 **可添加 Kotlin 扩展,解决泛型擦除问题**
