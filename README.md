@@ -39,7 +39,7 @@ allprojects {
     }
 }
 ```
-**RxJava 2.0**
+**RxJava 3.0**
 ```groovy
 implementation 'com.github.z-chu.RxCache:rxcache:3.0.0'
 ```
